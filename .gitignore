@@ -1,0 +1,53 @@
+# ===============================
+# Node.js (Next.js & Express.js)
+# ===============================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+dist/
+.next/
+out/
+
+# ===============================
+# Logs
+# ===============================
+logs
+*.log
+logs/**/*.log
+
+# ===============================
+# VSCode
+# ===============================
+.vscode/
+.history/
+
+# ===============================
+# OS specific files
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# ===============================
+# Optional: coverage and testing
+# ===============================
+coverage/
+.nyc_output/
+test-output/
+
+# ===============================
+# Optional: build and cache folders
+# ===============================
+.cache/
+.parcel-cache/
+turbo/
+
