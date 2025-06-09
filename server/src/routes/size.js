@@ -1,11 +1,11 @@
-const express = require('express');
+const express = require("express");
 
-const SizeController = require('../controllers/SizeController');
+const SizeController = require("../controllers/SizeController");
 
 let router = express.Router();
 
-router.post('/create', SizeController.create);
+router.post("/create", SizeController.create);
 
-router.get('/list', SizeController.list);
+router.get("/list", SizeController.list);
 
 module.exports = router;
