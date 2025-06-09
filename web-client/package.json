@@ -1,8 +1,8 @@
 {
-  "name": "clothes-web-shop-fe-landing",
+  "name": "fashion-shop-web-client",
+  "author": "Nguyen Huu Dat",
   "version": "0.1.0",
   "private": true,
-  "author": "Lê Tấn Phát",
   "license": "ISC",
   "scripts": {
     "dev": "next dev --port 3001",

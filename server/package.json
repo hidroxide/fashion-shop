@@ -1,9 +1,9 @@
 {
-  "name": "clothes-web-shop-be",
+  "name": "fashion-shop-server",
+  "author": "Nguyen Huu Dat",
   "version": "1.0.0",
   "private": true,
   "main": "index.js",
-  "author": "Lê Tấn Phát",
   "license": "ISC",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

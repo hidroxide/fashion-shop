@@ -1,8 +1,8 @@
 {
-  "name": "clothes-web-shop-fe-portal",
+  "name": "fashion-shop-admin-client",
+  "author": "Nguyen Huu Dat",
   "version": "0.1.0",
   "private": true,
-  "author": "Lê Tấn Phát",
   "license": "ISC",
   "scripts": {
     "dev": "next dev",
