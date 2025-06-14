@@ -7,7 +7,7 @@ import { formatRate } from "@/helpers/format";
 
 const ProductItem = (props) => {
   return (
-    <div className="product-item col-6 col-md-4 col-lg-3 col-xxl">
+    <div className="product-item col-6 col-md-4 col-lg-3">
       <Link
         href={{
           pathname: `/product/${props.product_id}`,
