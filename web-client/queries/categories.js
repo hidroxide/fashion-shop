@@ -1,10 +1,10 @@
-import { createQueryKeys } from '@lukemorales/query-key-factory';
+import { createQueryKeys } from "@lukemorales/query-key-factory";
 
-import categoryService from '@/services/categoryService';
+import categoryService from "@/services/categoryService";
 
-export default createQueryKeys('categories', {
-    list: () => ({
-        queryKey: [],
-        queryFn: () => categoryService.getNestList()
-    })
+export default createQueryKeys("categories", {
+  list: () => ({
+    queryKey: [],
+    queryFn: () => categoryService.getNestList(),
+  }),
 });
