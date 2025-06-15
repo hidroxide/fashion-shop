@@ -21,13 +21,12 @@ const CollectionPage = () => {
         className="custom-breadcrumb"
         items={[
           { title: "Trang chủ", href: "/" },
-          {
-            title: "Danh mục",
-            href: category
-              ? `/collections?category=${category}`
-              : "/collections",
-          },
-          // Chỉ hiển thị categoryTitle nếu category tồn tại và không phải "undefined"
+          category && category !== "undefined"
+            ? {
+                title: "Danh mục",
+                href: `/collections?category=${category}`,
+              }
+            : { title: "Tất cả" },
           category && category !== "undefined" && { title: categoryTitle },
         ].filter(Boolean)}
       />
