@@ -9,6 +9,7 @@ import { formatPrice } from "@/helpers/format";
 import orderService from "@/services/orderService";
 import useCartStore from "@/store/cartStore";
 import { useRouter } from "next/router";
+import { Breadcrumb } from "antd";
 
 const CartPage = () => {
   const router = useRouter();
@@ -78,56 +79,64 @@ const CartPage = () => {
   );
 
   return (
-    <div className="cart-page container pb-4">
-      <div className="row">
-        <div className="col-7 cart-left-section">
-          {customerInfor && (
-            <CustomerInforForm
-              email={customerInfor.email}
-              customerName={customerInfor.customerName}
-              phoneNumber={customerInfor.phoneNumber}
-              address={customerInfor.address}
-              handlePlaceOrder={handlePlaceOrder}
-            />
-          )}
-        </div>
-        <div className="col-5 cart-right-section">
-          <div className="title">Giỏ hàng</div>
-          <div className="cart-section">
-            {productList.length > 0 ? (
-              productList &&
-              productList.map((product, index) => {
-                return (
-                  <CartItem
-                    key={index}
-                    productVariantId={product.productVariantId}
-                    name={product.name}
-                    image={product.image}
-                    colour={product.colour}
-                    size={product.size}
-                    quantity={product.quantity}
-                    totalValue={formatPrice(product.totalValue)}
-                  />
-                );
-              })
-            ) : (
-              <p className="text-center">Chưa có sản phẩm nào trong giỏ hàng</p>
+    <div>
+      <Breadcrumb
+        className="custom-breadcrumb"
+        items={[{ title: "Trang chủ", href: "/" }, { title: "Giỏ hàng" }]}
+      />
+      <div className="cart-page container pb-4">
+        <div className="row">
+          <div className="col-7 cart-left-section">
+            {customerInfor && (
+              <CustomerInforForm
+                email={customerInfor.email}
+                customerName={customerInfor.customerName}
+                phoneNumber={customerInfor.phoneNumber}
+                address={customerInfor.address}
+                handlePlaceOrder={handlePlaceOrder}
+              />
             )}
           </div>
-          <div className="row pricing-info">
-            <div className="pricing-info-item position-relative d-flex justify-content-between">
-              <p>Tạm tính</p>
-              <p>{formatPrice(totalPrice)}đ</p>
+          <div className="col-5 cart-right-section">
+            <div className="title">Giỏ hàng</div>
+            <div className="cart-section">
+              {productList.length > 0 ? (
+                productList &&
+                productList.map((product, index) => {
+                  return (
+                    <CartItem
+                      key={index}
+                      productVariantId={product.productVariantId}
+                      name={product.name}
+                      image={product.image}
+                      colour={product.colour}
+                      size={product.size}
+                      quantity={product.quantity}
+                      totalValue={formatPrice(product.totalValue)}
+                    />
+                  );
+                })
+              ) : (
+                <p className="text-center">
+                  Chưa có sản phẩm nào trong giỏ hàng
+                </p>
+              )}
             </div>
-            <div className="pricing-info-item d-flex justify-content-between">
-              <p>Phí giao hàng</p>
-              <p>{formatPrice(deliveryCharges)}đ</p>
-            </div>
-            <div className="pricing-info-item final-total-box position-relative d-flex justify-content-between">
-              <p className="fw-bold">Tổng</p>
-              <p className="fw-bold" style={{ fontSize: "20px" }}>
-                {formatPrice(finalTotal)}đ
-              </p>
+            <div className="row pricing-info">
+              <div className="pricing-info-item position-relative d-flex justify-content-between">
+                <p>Tạm tính</p>
+                <p>{formatPrice(totalPrice)}đ</p>
+              </div>
+              <div className="pricing-info-item d-flex justify-content-between">
+                <p>Phí giao hàng</p>
+                <p>{formatPrice(deliveryCharges)}đ</p>
+              </div>
+              <div className="pricing-info-item final-total-box position-relative d-flex justify-content-between">
+                <p className="fw-bold">Tổng</p>
+                <p className="fw-bold" style={{ fontSize: "20px" }}>
+                  {formatPrice(finalTotal)}đ
+                </p>
+              </div>
             </div>
           </div>
         </div>

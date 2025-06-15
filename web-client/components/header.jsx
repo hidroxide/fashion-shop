@@ -117,7 +117,7 @@ const Header = () => {
           ) : (
             <>
               <li className="inner-item menu-item fw-bold text-uppercase">
-                <Link href="/account/infor">Account</Link>
+                <Link href="/account/infor">Tài khoản</Link>
               </li>
               <li
                 onClick={() => {
@@ -152,7 +152,7 @@ const Header = () => {
                 }}
                 className="inner-item menu-item fw-bold text-uppercase"
               >
-                <a href="#">Log Out</a>
+                <a href="#">Đăng xuất</a>
               </li>
             </>
           )}
