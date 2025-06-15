@@ -3,6 +3,7 @@ import { Empty } from "antd";
 import { useRouter } from "next/router";
 
 import ProductItem from "@/components/collectionPage/productItem";
+import { formatPrice } from "@/helpers/format";
 import queries from "@/queries";
 
 const CollectionPage = () => {
@@ -24,7 +25,7 @@ const CollectionPage = () => {
                 product_id={product.product_id}
                 name={product.product_name}
                 img={product.product_image}
-                price={product.price}
+                price={formatPrice(product.price)}
                 colour_id={product.colour_id}
                 sizes={product.sizes}
                 rating={product.rating}
