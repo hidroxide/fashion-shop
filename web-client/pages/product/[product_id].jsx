@@ -1,7 +1,7 @@
 import { swtoast } from "@/mixins/swal.mixin.js";
 import { StarFilled } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Rate } from "antd";
+import { Rate, Breadcrumb } from "antd";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
@@ -35,6 +35,8 @@ const ProductDetailPage = () => {
   const feedbackQuantity = productQuery.data?.data.feedback_quantity;
   const rating = productQuery.data?.data.rating;
   const sold = productQuery.data?.data.sold;
+  const categoryId = productQuery.data?.data.Category?.category_id;
+  const categoryTitle = productQuery.data?.data.Category?.title;
 
   const colourListQuery = useQuery(queries.products.colourList(product_id));
   if (colourListQuery.isError) console.log(colourListQuery.error);
@@ -108,116 +110,129 @@ const ProductDetailPage = () => {
   };
 
   return (
-    <div className="product-detail-page container">
-      <div className="row main-infor-product">
-        <div className="col-4">
-          {productImageList && <CarouselFade imageList={productImageList} />}
-        </div>
-        <div className="col-8">
-          <h6 className="product-name">{productName && productName}</h6>
-          <div className="rating d-flex align-items-center">
-            <span className="d-flex align-items-center">
-              <Rate disabled allowHalf value={rating && rating} />
-              <h6 className="d-inline-block">
-                {feedbackQuantity && feedbackQuantity}
-              </h6>
-            </span>
-            <span style={{ margin: "2px 0 0" }}>Đã bán: {sold && sold}</span>
+    <div>
+      <Breadcrumb
+        className="custom-breadcrumb"
+        items={[
+          { title: "Trang chủ", href: "/" },
+          { title: "Danh mục", href: "/collections" },
+          categoryId && {
+            title: categoryTitle,
+            href: `/collections?category=${categoryId}`,
+          },
+          { title: productName },
+        ].filter(Boolean)}
+      />
+      <div className="product-detail-page container">
+        <div className="row main-infor-product">
+          <div className="col-4">
+            {productImageList && <CarouselFade imageList={productImageList} />}
           </div>
-          <div className="price-box">
-            {price && <span>{formatPrice(price)}đ</span>}
-          </div>
-          <div className="colour-option-box">
-            <span>
-              Màu:
-              <strong>
-                &nbsp;
-                {colourList && selectedColourIndex != null
-                  ? colourList[selectedColourIndex]?.colour_name
-                  : ""}
-              </strong>
-            </span>
-            <div>
-              <ColourList
-                productId={product_id}
-                colourList={colourList}
-                selectedColourIndex={selectedColourIndex}
-                setSelectedColourIndex={setSelectedColourIndex}
-              />
+          <div className="col-8">
+            <h6 className="product-name">{productName && productName}</h6>
+            <div className="rating d-flex align-items-center">
+              <span className="d-flex align-items-center">
+                <Rate disabled allowHalf value={rating && rating} />
+                <h6 className="d-inline-block">
+                  {feedbackQuantity && feedbackQuantity}
+                </h6>
+              </span>
+              <span style={{ margin: "2px 0 0" }}>Đã bán: {sold && sold}</span>
             </div>
-          </div>
-          <div className="size-option-box">
-            <span>
-              Kích cỡ:&nbsp;
-              <strong>
-                {sizeList && selectedSizeIndex != null
-                  ? sizeList[selectedSizeIndex]?.size_name
-                  : ""}
-              </strong>
-            </span>
-            <div>
-              {sizeList &&
-                sizeList.map((size, index) => {
+            <div className="price-box">
+              {price && <span>{formatPrice(price)}đ</span>}
+            </div>
+            <div className="colour-option-box">
+              <span>
+                Màu:
+                <strong>
+                  &nbsp;
+                  {colourList && selectedColourIndex != null
+                    ? colourList[selectedColourIndex]?.colour_name
+                    : ""}
+                </strong>
+              </span>
+              <div>
+                <ColourList
+                  productId={product_id}
+                  colourList={colourList}
+                  selectedColourIndex={selectedColourIndex}
+                  setSelectedColourIndex={setSelectedColourIndex}
+                />
+              </div>
+            </div>
+            <div className="size-option-box">
+              <span>
+                Kích cỡ:&nbsp;
+                <strong>
+                  {sizeList && selectedSizeIndex != null
+                    ? sizeList[selectedSizeIndex]?.size_name
+                    : ""}
+                </strong>
+              </span>
+              <div>
+                {sizeList &&
+                  sizeList.map((size, index) => {
+                    return (
+                      <OptionButton
+                        key={index}
+                        isSelected={selectedSizeIndex === index}
+                        content={size.size_name}
+                        getContent={() => setSelectedSizeIndex(index)}
+                      />
+                    );
+                  })}
+              </div>
+            </div>
+            <div className="action-box row">
+              <ProductQuantityInput
+                quantity={quantity}
+                setQuantity={setQuantity}
+              />
+              <div
+                className="add-product-to-cart-button border-radius col-7 d-flex justify-content-around align-items-center"
+                onClick={handleAddToCart}
+              >
+                Thêm vào giỏ hàng
+              </div>
+            </div>
+            <div className="policy-box d-flex flex-wrap justify-content-around position-relative">
+              {policyList &&
+                policyList.map((item, index) => {
                   return (
-                    <OptionButton
-                      key={index}
-                      isSelected={selectedSizeIndex === index}
-                      content={size.size_name}
-                      getContent={() => setSelectedSizeIndex(index)}
-                    />
+                    <PolicyItem key={index} icon={item.icon} des={item.des} />
                   );
                 })}
             </div>
           </div>
-          <div className="action-box row">
-            <ProductQuantityInput
-              quantity={quantity}
-              setQuantity={setQuantity}
-            />
-            <div
-              className="add-product-to-cart-button border-radius col-7 d-flex justify-content-around align-items-center"
-              onClick={handleAddToCart}
-            >
-              Thêm vào giỏ hàng
-            </div>
-          </div>
-          <div className="policy-box d-flex flex-wrap justify-content-around position-relative">
-            {policyList &&
-              policyList.map((item, index) => {
-                return (
-                  <PolicyItem key={index} icon={item.icon} des={item.des} />
-                );
-              })}
+        </div>
+        <div className="row product-detail">
+          <div className="col-12">
+            <h5 className="title text-center">Chi tiết sản phẩm</h5>
+            {productDescription && (
+              <div dangerouslySetInnerHTML={{ __html: productDescription }} />
+            )}
           </div>
         </div>
-      </div>
-
-      <div className="row product-detail">
-        <div className="col-12">
-          <h5 className="title text-center">Chi tiết sản phẩm</h5>
-          {productDescription && (
-            <div dangerouslySetInnerHTML={{ __html: productDescription }} />
-          )}
-        </div>
-      </div>
-      <div className="review-box position-relative d-flex align-items-center">
-        <div className="">
-          <h5 className="feedback_quantify-detail d-inline-block">
-            {feedbackQuantity > 0
-              ? `${feedbackQuantity} Đánh giá`
-              : "Sản phẩm hiện chưa có đánh giá"}
-          </h5>
-          {feedbackQuantity > 0 ? (
-            <h5 className="rating-detail d-inline-block">
-              {rating && `${formatRate(rating)} / 5`}
-              <span className="star-icon">
-                <StarFilled />
-              </span>
+        <div className="review-box position-relative d-flex align-items-center">
+          <div className="">
+            <h5 className="feedback_quantify-detail d-inline-block">
+              {feedbackQuantity > 0
+                ? `${feedbackQuantity} Đánh giá`
+                : "Sản phẩm hiện chưa có đánh giá"}
             </h5>
-          ) : null}
+            {feedbackQuantity > 0 ? (
+              <h5 className="rating-detail d-inline-block">
+                {rating && `${formatRate(rating)} / 5`}
+                <span className="star-icon">
+                  <StarFilled />
+                </span>
+              </h5>
+            ) : null}
+          </div>
         </div>
+        <FeedbackBox productId={product_id} />
       </div>
-      <FeedbackBox productId={product_id} />
     </div>
   );
 };

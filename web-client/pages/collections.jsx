@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Empty } from "antd";
+import { Empty, Breadcrumb } from "antd";
 import { useRouter } from "next/router";
 
 import ProductItem from "@/components/collectionPage/productItem";
@@ -13,32 +13,50 @@ const CollectionPage = () => {
   const { isError, error, data } = useQuery(queries.products.list(category));
   if (isError) console.log(error);
   const productList = data?.data;
+  const categoryTitle = productList?.[0]?.category_title;
 
   return (
-    <div className="product-page container pt-4">
-      <div className="product-list row">
-        {productList && productList.length ? (
-          productList.map((product, index) => {
-            return (
-              <ProductItem
-                key={index}
-                product_id={product.product_id}
-                name={product.product_name}
-                img={product.product_image}
-                price={formatPrice(product.price)}
-                colour_id={product.colour_id}
-                sizes={product.sizes}
-                rating={product.rating}
-                sold={product.sold}
-                feedback_quantity={product.feedback_quantity}
-              />
-            );
-          })
-        ) : (
-          <div className="d-flex" style={{ width: "100%", height: "400px" }}>
-            <Empty style={{ margin: "auto" }} />
-          </div>
-        )}
+    <div>
+      <Breadcrumb
+        className="custom-breadcrumb"
+        items={[
+          { title: "Trang chủ", href: "/" },
+          {
+            title: "Danh mục",
+            href: category
+              ? `/collections?category=${category}`
+              : "/collections",
+          },
+          // Chỉ hiển thị categoryTitle nếu category tồn tại và không phải "undefined"
+          category && category !== "undefined" && { title: categoryTitle },
+        ].filter(Boolean)}
+      />
+
+      <div className="product-page container">
+        <div className="product-list row pt-4">
+          {productList && productList.length ? (
+            productList.map((product, index) => {
+              return (
+                <ProductItem
+                  key={index}
+                  product_id={product.product_id}
+                  name={product.product_name}
+                  img={product.product_image}
+                  price={formatPrice(product.price)}
+                  colour_id={product.colour_id}
+                  sizes={product.sizes}
+                  rating={product.rating}
+                  sold={product.sold}
+                  feedback_quantity={product.feedback_quantity}
+                />
+              );
+            })
+          ) : (
+            <div className="d-flex" style={{ width: "100%", height: "400px" }}>
+              <Empty style={{ margin: "auto" }} />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

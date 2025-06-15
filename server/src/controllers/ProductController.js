@@ -151,12 +151,18 @@ let listCustomerSide = async (req, res, next) => {
                 "sold",
                 "feedback_quantity",
               ],
-              include: {
-                model: Product_Price_History,
-                attributes: ["price"],
-                separate: true,
-                order: [["created_at", "DESC"]],
-              },
+              include: [
+                {
+                  model: Product_Price_History,
+                  attributes: ["price"],
+                  separate: true,
+                  order: [["created_at", "DESC"]],
+                },
+                {
+                  model: Category,
+                  attributes: ["title"],
+                },
+              ],
               where: whereClause,
             },
             { model: Colour, attributes: ["colour_name"] },
@@ -190,6 +196,8 @@ let listCustomerSide = async (req, res, next) => {
             product_image:
               listProductVariantSameColour[0].Product_Images[0].path,
             sizes: [],
+            category_title:
+              listProductVariantSameColour[0].Product.Category.title,
           };
           // Duyệt qua danh sách biến thể sản phẩm có cùng màu để cộng dồn danh sách sizes
           for (let { Size } of listProductVariantSameColour)
@@ -219,9 +227,15 @@ let detailCustomerSide = async (req, res, next) => {
         "rating",
         "sold",
         "feedback_quantity",
+        "category_id",
       ],
       where: { product_id },
-      raw: true,
+      include: [
+        {
+          model: Category,
+          attributes: ["category_id", "title"],
+        },
+      ],
     });
     return res.send(productDetail);
   } catch (err) {
