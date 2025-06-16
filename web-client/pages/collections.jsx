@@ -16,7 +16,7 @@ const CollectionPage = () => {
   const categoryTitle = productList?.[0]?.category_title;
 
   return (
-    <div>
+    <>
       <Breadcrumb
         className="custom-breadcrumb"
         items={[
@@ -30,7 +30,6 @@ const CollectionPage = () => {
           category && category !== "undefined" && { title: categoryTitle },
         ].filter(Boolean)}
       />
-
       <div className="product-page container">
         <div className="product-list row pt-4">
           {productList && productList.length ? (
@@ -57,7 +56,7 @@ const CollectionPage = () => {
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

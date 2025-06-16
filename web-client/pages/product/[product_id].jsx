@@ -110,7 +110,7 @@ const ProductDetailPage = () => {
   };
 
   return (
-    <div>
+    <>
       <Breadcrumb
         className="custom-breadcrumb"
         items={[
@@ -206,6 +206,7 @@ const ProductDetailPage = () => {
             </div>
           </div>
         </div>
+
         <div className="row product-detail">
           <div className="col-12">
             <h5 className="title text-center">Chi tiết sản phẩm</h5>
@@ -233,7 +234,7 @@ const ProductDetailPage = () => {
         </div>
         <FeedbackBox productId={product_id} />
       </div>
-    </div>
+    </>
   );
 };
 
