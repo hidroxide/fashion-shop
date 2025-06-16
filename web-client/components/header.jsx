@@ -9,6 +9,7 @@ import logo from "@/public/img/logo.png";
 import queries from "@/queries";
 import customerService from "@/services/customerService";
 import useCustomerStore from "@/store/customerStore";
+import useCartStore from "@/store/cartStore";
 import Login from "./login";
 import Register from "./register";
 
@@ -62,6 +63,9 @@ const Header = () => {
         }
       });
   };
+
+  const cartItems = useCartStore((state) => state.productList);
+  const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
     <div className="header-wrapper position-relation">
@@ -164,9 +168,14 @@ const Header = () => {
               </li>
             </>
           )}
-          <li className="cart menu-item fw-bold text-uppercase">
+          <li className="cart menu-item fw-bold text-uppercase position-relative">
             <Link href="/cart">
               <FaShoppingCart />
+              {cartCount > 0 && (
+                <span className="cart-count position-absolute top-0 start-100 translate-middle badge rounded-circle bg-danger mt-4">
+                  {cartCount}
+                </span>
+              )}
             </Link>
           </li>
         </ul>

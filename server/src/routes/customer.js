@@ -17,4 +17,6 @@ router.get("/infor", jwtAuth, CustomerController.getInfor);
 
 router.put("/update", jwtAuth, CustomerController.update);
 
+router.put("/change-password", jwtAuth, CustomerController.changePassword);
+
 module.exports = router;

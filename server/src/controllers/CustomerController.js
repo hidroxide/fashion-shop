@@ -242,6 +242,44 @@ let update = async (req, res, next) => {
   }
 };
 
+let changePassword = async (req, res, next) => {
+  const user_id = req.token.customer_id;
+  if (!user_id)
+    return res.status(400).send({ message: "Access Token không hợp lệ" });
+
+  const { old_password, new_password, confirm_password } = req.body;
+
+  if (!old_password || !new_password || !confirm_password) {
+    return res.status(400).send({ message: "Vui lòng nhập đầy đủ thông tin" });
+  }
+
+  if (new_password !== confirm_password) {
+    return res
+      .status(400)
+      .send({ message: "Mật khẩu mới và xác nhận mật khẩu không khớp" });
+  }
+
+  try {
+    const customer = await User.findOne({ where: { user_id, role_id: 2 } });
+    if (!customer) {
+      return res.status(404).send({ message: "Người dùng không tồn tại" });
+    }
+
+    const isPasswordValid = bcrypt.compareSync(old_password, customer.password);
+    if (!isPasswordValid) {
+      return res.status(401).send({ message: "Mật khẩu cũ không đúng" });
+    }
+
+    const hashPassword = bcrypt.hashSync(new_password, 10);
+    await User.update({ password: hashPassword }, { where: { user_id } });
+
+    return res.send({ message: "Đổi mật khẩu thành công" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ message: "Có lỗi xảy ra, vui lòng thử lại" });
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -249,4 +287,5 @@ module.exports = {
   refreshAccessToken,
   getInfor,
   update,
+  changePassword,
 };

@@ -47,6 +47,7 @@ const CustomerInforPage = () => {
           data: customerInfor,
         });
         swtoast.success({ text: "Cập nhật tài khoản thành công" });
+        router.push("/");
       } catch (err) {
         console.log(err);
         swtoast.error({

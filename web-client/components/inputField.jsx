@@ -14,7 +14,7 @@ const InputField = ({ name, control, disabled, placeholder, password }) => {
           (!!error ? " has-error" : "") +
           (!!disabled ? " disabled" : "")
         }
-        value={value}
+        value={value ?? ""}
         type={password ? "password" : "text"}
         disabled={!!disabled}
         placeholder={placeholder}
