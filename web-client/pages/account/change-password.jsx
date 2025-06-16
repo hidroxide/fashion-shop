@@ -8,7 +8,33 @@ import { swtoast } from "@/mixins/swal.mixin";
 import queries from "@/queries";
 import customerService from "@/services/customerService";
 
-const ChangePassword = () => {
+const ChangePasswordPage = () => {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const handleChangePassword = useCallback(async (formData) => {
+    try {
+      const { oldPassword, newPassword, confirmPassword } = formData;
+
+      await customerService.changePassword({
+        old_password: oldPassword,
+        new_password: newPassword,
+        confirm_password: confirmPassword,
+      });
+
+      swtoast.success({ text: "Đổi mật khẩu thành công!" });
+
+      // Optional: redirect hoặc logout sau khi đổi mật khẩu
+      // await customerService.logout();
+      router.push("/");
+    } catch (err) {
+      console.log(err);
+      swtoast.error({
+        text: "Có lỗi khi cập nhật tài khoản vui lòng thử lại!",
+      });
+    }
+  }, []);
+
   return (
     <div className="change-password-page container">
       <div className="change-password row">
@@ -16,11 +42,11 @@ const ChangePassword = () => {
           <AccountSidebar />
         </div>
         <div className="col-8">
-          <ChangePasswordForm />
+          <ChangePasswordForm handleChangePassword={handleChangePassword} />
         </div>
       </div>
     </div>
   );
 };
 
-export default ChangePassword;
+export default ChangePasswordPage;

@@ -26,6 +26,7 @@ const CustomerInforForm = ({
       .required("Vui lòng nhập Địa chỉ của bạn")
       .max(255, "Địa chỉ không được vượt quá 255 ký tự"),
   });
+
   const {
     control,
     handleSubmit,

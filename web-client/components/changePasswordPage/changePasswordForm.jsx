@@ -35,6 +35,7 @@ const ChangePasswordForm = ({ handleChangePassword }) => {
               name="oldPassword"
               control={control}
               placeholder={"Nhập mật khẩu cũ"}
+              password={true}
             />
           </div>
         </div>
@@ -47,6 +48,7 @@ const ChangePasswordForm = ({ handleChangePassword }) => {
               name="newPassword"
               control={control}
               placeholder={"Nhập mật khẩu mới"}
+              password={true}
             />
           </div>
         </div>
@@ -59,6 +61,7 @@ const ChangePasswordForm = ({ handleChangePassword }) => {
               name="confirmPassword"
               control={control}
               placeholder={"Nhập xác nhận mật khẩu mới"}
+              password={true}
             />
           </div>
         </div>

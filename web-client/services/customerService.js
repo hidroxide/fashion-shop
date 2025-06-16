@@ -25,6 +25,10 @@ const customerService = {
   update: async (data) => {
     return await axiosJWT.put("/customer/update", data);
   },
+
+  changePassword: async (data) => {
+    return await axiosJWT.put("/customer/change-password", data);
+  },
 };
 
 export default customerService;
