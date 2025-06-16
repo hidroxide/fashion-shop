@@ -31,6 +31,38 @@ const Header = () => {
     setIsRegisterOpen(false);
   };
 
+  const handleLoginClick = () => {
+    setIsLogInOpen(true);
+  };
+
+  const handleLogoutClick = () => {
+    swalert
+      .fire({
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showCancelButton: true,
+        showLoaderOnConfirm: true,
+        preConfirm: async () => {
+          try {
+            await customerService.logout();
+            return { isError: false };
+          } catch (error) {
+            console.log(error);
+            return { isError: true };
+          }
+        },
+        title: "Đăng xuất",
+        icon: "warning",
+        text: "Bạn muốn đăng xuất?",
+      })
+      .then(async (result) => {
+        if (result.isConfirmed) {
+          setCustomerLogout();
+          swtoast.success({ text: "Đăng xuất thành công!" });
+        }
+      });
+  };
+
   return (
     <div className="header-wrapper position-relation">
       {!isLoggedIn && (
@@ -104,59 +136,35 @@ const Header = () => {
             })}
         </ul>
 
-        <ul className="header-inner p-2 ms-auto">
+        <ul className="menu p-5 ms-auto">
           {!isLoggedIn ? (
             <li
-              onClick={() => {
-                setIsLogInOpen(true);
-              }}
-              className="inner-item menu-item fw-bold text-uppercase"
+              onClick={handleLoginClick}
+              className="menu-item fw-bold text-uppercase"
             >
               <a href="#">Đăng Nhập</a>
             </li>
           ) : (
             <>
-              <li className="inner-item menu-item fw-bold text-uppercase">
-                <Link href="/account/infor">Tài khoản</Link>
-              </li>
-              <li
-                onClick={() => {
-                  swalert
-                    .fire({
-                      allowOutsideClick: false,
-                      allowEscapeKey: false,
-                      showCancelButton: true,
-                      showLoaderOnConfirm: true,
-                      preConfirm: async () => {
-                        try {
-                          await customerService.logout();
-                          return { isError: false };
-                        } catch (error) {
-                          console.log(error);
-                          return { isError: true };
-                        }
-                      },
-                      title: "Đăng xuất",
-                      icon: "warning",
-                      text: "Bạn muốn đăng xuất?",
-                    })
-                    .then(async (result) => {
-                      if (result.isConfirmed && !result.value?.isError) {
-                        setCustomerLogout();
-                        swtoast.success({ text: "Đăng xuất thành công!" });
-                      } else if (result.isConfirmed && result.value?.isError) {
-                        setCustomerLogout();
-                        swtoast.success({ text: "Đăng xuất thành công!" });
-                      }
-                    });
-                }}
-                className="inner-item menu-item fw-bold text-uppercase"
-              >
-                <a href="#">Đăng xuất</a>
+              <li className="menu-item fw-bold text-uppercase position-relative">
+                <Link href="#" className="d-flex align-items-center">
+                  Tài Khoản
+                  <span>
+                    <FaAngleDown />
+                  </span>
+                </Link>
+                <ul className="sub-menu position-absolute">
+                  <li className="w-100">
+                    <Link href="/account/infor">Thông Tin</Link>
+                  </li>
+                  <li className="w-100" onClick={handleLogoutClick}>
+                    <a href="#">Đăng Xuất</a>
+                  </li>
+                </ul>
               </li>
             </>
           )}
-          <li className="cart inner-item menu-item fw-bold text-uppercase">
+          <li className="cart menu-item fw-bold text-uppercase">
             <Link href="/cart">
               <FaShoppingCart />
             </Link>
