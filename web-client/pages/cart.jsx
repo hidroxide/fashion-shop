@@ -79,7 +79,7 @@ const CartPage = () => {
   );
 
   return (
-    <div>
+    <>
       <Breadcrumb
         className="custom-breadcrumb"
         items={[{ title: "Trang chủ", href: "/" }, { title: "Giỏ hàng" }]}
@@ -141,7 +141,7 @@ const CartPage = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

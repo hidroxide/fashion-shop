@@ -63,8 +63,8 @@ const Header = () => {
         </div>
         <ul className="menu p-2">
           <li className="menu-item fw-bold text-uppercase position-relative">
-            <Link href="/collections" className="d-flex align-items-center">
-              Tất cả
+            <Link href="/" className="d-flex align-items-center">
+              Trang chủ
             </Link>
           </li>
           {categoryList &&
