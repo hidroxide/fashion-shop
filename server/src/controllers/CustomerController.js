@@ -1,9 +1,11 @@
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { jwtDecode } = require("jwt-decode");
 
 const User = require("../models/user");
 const Customer_Info = require("../models/customer_info");
+const { sendEmail, verifyEmailTemplate } = require("../utils/sendEmail");
 
 let register = async (req, res, next) => {
   let email = req.body.email;
@@ -37,29 +39,17 @@ let register = async (req, res, next) => {
         phone_number,
       });
 
-      const accessToken = jwt.sign(
+      const verifyToken = jwt.sign(
         { customer_id: newCustomer.user_id },
         process.env.ACCESSTOKEN_SECRET_KEY,
         { expiresIn: process.env.ACCESSTOKEN_EXPIRES_IN }
       );
 
-      const { exp } = jwtDecode(accessToken);
-      const accessTokenExpires = exp;
-
-      const refreshToken = jwt.sign(
-        { customer_id: newCustomer.user_id },
-        process.env.REFRESHTOKEN_SECRET_KEY,
-        { expiresIn: process.env.REFRESHTOKEN_EXPIRES_IN }
-      );
-
-      res.cookie("refresh_token", refreshToken, {
-        httpOnly: true,
-        path: "/",
-        sameSite: "strict",
-      });
-      return res.send({
-        access_token: accessToken,
-        access_token_expires: accessTokenExpires,
+      const verifyLink = `${process.env.CLIENT_URL}/verify-email?token=${verifyToken}`;
+      await sendEmail({
+        to: email,
+        subject: "Xác thực Email",
+        html: verifyEmailTemplate(verifyLink),
       });
     } catch (err) {
       console.log(err);
@@ -93,6 +83,12 @@ let login = async (req, res, next) => {
       return res
         .status(401)
         .send({ message: "Email hoặc Mật khẩu không đúng" });
+    }
+
+    if (!customer.is_verified) {
+      return res
+        .status(403)
+        .send({ message: "Vui lòng xác thực Email trước khi đăng nhập" });
     }
 
     const accessToken = jwt.sign(
@@ -280,6 +276,31 @@ let changePassword = async (req, res, next) => {
   }
 };
 
+let verifyEmail = async (req, res) => {
+  const { token } = req.query;
+
+  if (!token) return res.status(400).send({ message: "Token không hợp lệ" });
+
+  try {
+    const user = await User.findOne({
+      where: { verify_token: token, role_id: 2 },
+    });
+    if (!user)
+      return res
+        .status(400)
+        .send({ message: "Token không chính xác hoặc đã hết hạn" });
+
+    await user.update({ is_verified: true, verify_token: null });
+
+    return res.send({
+      message: "Xác thực email thành công. Bạn có thể đăng nhập.",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ message: "Có lỗi xảy ra, vui lòng thử lại" });
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -288,4 +309,5 @@ module.exports = {
   getInfor,
   update,
   changePassword,
+  verifyEmail,
 };

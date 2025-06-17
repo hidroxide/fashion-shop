@@ -7,6 +7,8 @@ let router = express.Router();
 
 router.post("/register", CustomerController.register);
 
+router.get("/verify-email", CustomerController.verifyEmail);
+
 router.post("/login", CustomerController.login);
 
 router.post("/logout", CustomerController.logout);
