@@ -62,5 +62,15 @@
     .footer-form-item:hover {
       color: var(--black);
     }
+
+    .footer-form-item a {
+      text-decoration: none;
+      padding: 16px 0 4px;
+      transition: all 0.2s ease;
+    }
+
+    .footer-form-item a:hover {
+      color: var(--black);
+    }
   }
 }

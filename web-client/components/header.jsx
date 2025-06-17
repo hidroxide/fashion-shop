@@ -12,10 +12,12 @@ import useCustomerStore from "@/store/customerStore";
 import useCartStore from "@/store/cartStore";
 import Login from "./login";
 import Register from "./register";
+import ForgotPassword from "./forgotPassword";
 
 const Header = () => {
   const [isLogInOpen, setIsLogInOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const [isForgotOpen, setIsForgotOpen] = useState(false);
   const isLoggedIn = useCustomerStore((state) => state.isLoggedIn);
   const setCustomerLogout = useCustomerStore(
     (state) => state.setCustomerLogout
@@ -71,26 +73,54 @@ const Header = () => {
     <div className="header-wrapper position-relation">
       {!isLoggedIn && (
         <>
-          <div className={!isLogInOpen ? `${"d-none"}` : ""}>
+          <div className={!isLogInOpen ? `d-none` : ""}>
             <Login
               toRegister={() => {
                 setIsLogInOpen(false);
                 setIsRegisterOpen(true);
               }}
-              toClose={toClose}
+              toForgotPassword={() => {
+                setIsLogInOpen(false);
+                setIsForgotOpen(true);
+              }}
+              toClose={() => {
+                setIsLogInOpen(false);
+                setIsRegisterOpen(false);
+                setIsForgotOpen(false);
+              }}
             />
           </div>
-          <div className={!isRegisterOpen ? `${"d-none"}` : ""}>
+
+          <div className={!isRegisterOpen ? `d-none` : ""}>
             <Register
               toLogin={() => {
                 setIsRegisterOpen(false);
                 setIsLogInOpen(true);
               }}
-              toClose={toClose}
+              toClose={() => {
+                setIsLogInOpen(false);
+                setIsRegisterOpen(false);
+                setIsForgotOpen(false);
+              }}
+            />
+          </div>
+
+          <div className={!isForgotOpen ? `d-none` : ""}>
+            <ForgotPassword
+              toLogin={() => {
+                setIsForgotOpen(false);
+                setIsLogInOpen(true);
+              }}
+              toClose={() => {
+                setIsLogInOpen(false);
+                setIsRegisterOpen(false);
+                setIsForgotOpen(false);
+              }}
             />
           </div>
         </>
       )}
+
       <div className="header w-100 d-flex align-items-center">
         <div className="logo-box p-2">
           <Link href="/">

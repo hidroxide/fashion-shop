@@ -136,7 +136,7 @@ const Register = (props) => {
         </form>
         <div className="footer-form d-flex justify-content-center">
           <a className="footer-form-item" href="#" onClick={props.toLogin}>
-            Đăng nhập
+            Trở lại đăng nhập
           </a>
         </div>
       </div>
