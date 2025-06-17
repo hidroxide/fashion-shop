@@ -45,8 +45,8 @@ let register = async (req, res, next) => {
         { expiresIn: process.env.ACCESSTOKEN_EXPIRES_IN }
       );
 
-      const verifyLink = `${process.env.CLIENT_URL}/verify-email?token=${verifyToken}`;
       await newCustomer.update({ verify_token: verifyToken });
+      const verifyLink = `${process.env.CLIENT_URL}/verify-email?token=${verifyToken}`;
 
       await sendEmail({
         to: email,
@@ -293,8 +293,9 @@ let verifyEmail = async (req, res) => {
 
   if (!token) return res.status(400).send({ message: "Token không hợp lệ" });
 
+  let decoded;
   try {
-    let decoded = jwt.verify(token, process.env.ACCESSTOKEN_SECRET_KEY);
+    decoded = jwt.verify(token, process.env.ACCESSTOKEN_SECRET_KEY);
   } catch (error) {
     return res
       .status(400)
