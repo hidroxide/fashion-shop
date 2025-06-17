@@ -58,17 +58,13 @@ const Register = (props) => {
         customer_name: values.fullName,
         phone_number: values.phoneNumber,
       };
-      const respond = await customerService.register(data);
+      await customerService.register(data); // Không cần lấy access token
 
-      const customerInfor = {
-        accessToken: respond?.data?.access_token,
-        accessTokenExpires: respond?.data?.access_token_expires,
-      };
-      setCustomerLogin(customerInfor);
       swtoast.success({
-        text: "Đăng ký tài khoản thành công!",
+        text: "Đăng ký thành công! Vui lòng kiểm tra email để xác thực.",
       });
-      props.toClose();
+
+      props.toLogin(); // Chuyển về form đăng nhập
     } catch (error) {
       swtoast.error({
         text: error.response?.data?.message,
