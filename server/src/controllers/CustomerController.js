@@ -27,7 +27,7 @@ let register = async (req, res, next) => {
   if (customer) return res.status(409).send({ message: "Email đã tồn tại" });
   else {
     try {
-      let hashPassword = bcrypt.hashSync(password, 10);
+      let hashPassword = await bcrypt.hash(password, 10);
       let newCustomer = await User.create({
         email: email,
         password: hashPassword,
@@ -46,10 +46,15 @@ let register = async (req, res, next) => {
       );
 
       const verifyLink = `${process.env.CLIENT_URL}/verify-email?token=${verifyToken}`;
+      await newCustomer.update({ verify_token: verifyToken });
+
       await sendEmail({
         to: email,
         subject: "Xác thực Email",
         html: verifyEmailTemplate(verifyLink),
+      });
+      return res.send({
+        message: "Đăng ký thành công. Vui lòng kiểm tra email để xác thực.",
       });
     } catch (err) {
       console.log(err);
@@ -78,7 +83,7 @@ let login = async (req, res, next) => {
         .send({ message: "Email hoặc Mật khẩu không đúng" });
     }
 
-    let isPasswordValid = bcrypt.compareSync(password, customer.password);
+    const isPasswordValid = await bcrypt.compare(password, customer.password);
     if (!isPasswordValid) {
       return res
         .status(401)
@@ -181,6 +186,10 @@ let getInfor = async (req, res, next) => {
         },
       ],
     });
+    if (!customer || !customer.Customer_Info)
+      return res
+        .status(404)
+        .send({ message: "Không tìm thấy thông tin người dùng" });
 
     return res.send({
       email: customer.email,
@@ -261,12 +270,15 @@ let changePassword = async (req, res, next) => {
       return res.status(404).send({ message: "Người dùng không tồn tại" });
     }
 
-    const isPasswordValid = bcrypt.compareSync(old_password, customer.password);
+    const isPasswordValid = await bcrypt.compare(
+      old_password,
+      customer.password
+    );
     if (!isPasswordValid) {
       return res.status(401).send({ message: "Mật khẩu cũ không đúng" });
     }
 
-    const hashPassword = bcrypt.hashSync(new_password, 10);
+    const hashPassword = await bcrypt.hash(new_password, 10);
     await User.update({ password: hashPassword }, { where: { user_id } });
 
     return res.send({ message: "Đổi mật khẩu thành công" });
@@ -282,8 +294,16 @@ let verifyEmail = async (req, res) => {
   if (!token) return res.status(400).send({ message: "Token không hợp lệ" });
 
   try {
+    let decoded = jwt.verify(token, process.env.ACCESSTOKEN_SECRET_KEY);
+  } catch (error) {
+    return res
+      .status(400)
+      .send({ message: "Token không hợp lệ hoặc đã hết hạn" });
+  }
+
+  try {
     const user = await User.findOne({
-      where: { verify_token: token, role_id: 2 },
+      where: { user_id: decoded.customer_id, verify_token: token, role_id: 2 },
     });
     if (!user)
       return res
