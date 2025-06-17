@@ -86,11 +86,23 @@ const Login = (props) => {
             </Button>
           </div>
         </form>
-        <div className="footer-form d-flex justify-content-center">
+        <div className="footer-form d-flex justify-content-center flex-column align-items-center">
           {!isSubmitting && (
-            <a className="footer-form-item" href="#" onClick={props.toRegister}>
-              Đăng ký tài khoản mới
-            </a>
+            <>
+              <div className="footer-form-item">
+                Bạn chưa có tài khoản?{" "}
+                <a href="#" onClick={props.toRegister}>
+                  Đăng ký
+                </a>
+              </div>
+              <a
+                className="footer-form-item"
+                href="#"
+                onClick={props.toForgotPassword}
+              >
+                Quên mật khẩu?
+              </a>
+            </>
           )}
         </div>
       </div>

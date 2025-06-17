@@ -19,6 +19,7 @@ const ChangePasswordForm = ({ handleChangePassword }) => {
     handleSubmit,
     formState: { isSubmitting },
   } = useForm({
+    defaultValues: { oldPassword: "", newPassword: "", confirmPassword: "" },
     resolver: yupResolver(schema),
   });
   return (
