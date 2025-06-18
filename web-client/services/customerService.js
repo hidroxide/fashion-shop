@@ -29,6 +29,12 @@ const customerService = {
   changePassword: async (data) => {
     return await axiosJWT.put("/customer/change-password", data);
   },
+
+  verifyEmail: async (token) => {
+    return await axiosClient.get("/customer/verify-email", {
+      params: { token },
+    });
+  },
 };
 
 export default customerService;
