@@ -28,14 +28,16 @@ const ForgotPassword = (props) => {
 
   const handleForgotPassword = async (values) => {
     try {
-      await customerService.forgotPassword(values); // Gửi email reset
+      await customerService.forgotPassword({ email: values.email });
+
       swtoast.success({
-        text: "Vui lòng kiểm tra email để đặt lại mật khẩu.",
+        text: "Yêu cầu đặt lại mật khẩu đã được gửi! Vui lòng kiểm tra email.",
       });
-      props.toClose(); // Đóng form
+
+      props.toLogin(); // Quay lại màn hình đăng nhập
     } catch (error) {
       swtoast.error({
-        text: error.response?.data?.message || "Đã xảy ra lỗi!",
+        text: error.response?.data?.message || "Đã xảy ra lỗi.",
       });
     }
   };

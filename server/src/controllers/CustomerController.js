@@ -366,8 +366,7 @@ const forgotPassword = async (req, res) => {
 };
 
 const resetPassword = async (req, res) => {
-  const { token } = req.query;
-  const { new_password, confirm_password } = req.body;
+  const { token, new_password, confirm_password } = req.body;
 
   if (!token) return res.status(400).send({ message: "Token không hợp lệ" });
 
