@@ -5,7 +5,11 @@ const { jwtDecode } = require("jwt-decode");
 
 const User = require("../models/user");
 const Customer_Info = require("../models/customer_info");
-const { sendEmail, verifyEmailTemplate } = require("../utils/sendEmail");
+const {
+  sendEmail,
+  verifyEmailTemplate,
+  resetPasswordTemplate,
+} = require("../utils/sendEmail");
 
 let register = async (req, res, next) => {
   let email = req.body.email;
@@ -322,6 +326,89 @@ let verifyEmail = async (req, res) => {
   }
 };
 
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).send({ message: "Vui lòng nhập email" });
+  }
+
+  try {
+    const user = await User.findOne({ where: { email, role_id: 2 } });
+    if (!user) {
+      return res.status(404).send({ message: "Không tìm thấy người dùng" });
+    }
+
+    const resetToken = jwt.sign(
+      { customer_id: user.user_id },
+      process.env.ACCESSTOKEN_SECRET_KEY,
+      { expiresIn: process.env.ACCESSTOKEN_EXPIRES_IN }
+    );
+
+    await user.update({ verify_token: resetToken }); // reuse trường verify_token nếu không có cột reset_token riêng
+
+    const resetLink = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}`;
+
+    await sendEmail({
+      to: email,
+      subject: "Đặt lại mật khẩu",
+      html: resetPasswordTemplate(resetLink),
+    });
+
+    return res.send({
+      message:
+        "Đã gửi email đặt lại mật khẩu. Vui lòng kiểm tra email của bạn.",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ message: "Có lỗi xảy ra, vui lòng thử lại" });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  const { token, new_password, confirm_password } = req.body;
+
+  if (!token) return res.status(400).send({ message: "Token không hợp lệ" });
+
+  if (!new_password || !confirm_password)
+    return res
+      .status(400)
+      .send({ message: "Vui lòng nhập đầy đủ mật khẩu mới và xác nhận" });
+
+  if (new_password !== confirm_password)
+    return res
+      .status(400)
+      .send({ message: "Mật khẩu mới và xác nhận không khớp" });
+
+  try {
+    const decoded = jwt.verify(token, process.env.ACCESSTOKEN_SECRET_KEY);
+
+    const user = await User.findOne({
+      where: {
+        user_id: decoded.customer_id,
+        verify_token: token,
+        role_id: 2,
+      },
+    });
+
+    if (!user)
+      return res
+        .status(400)
+        .send({ message: "Token không hợp lệ hoặc đã hết hạn" });
+
+    const hashPassword = await bcrypt.hash(new_password, 10);
+
+    await user.update({ password: hashPassword, verify_token: null });
+
+    return res.send({ message: "Đặt lại mật khẩu thành công" });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(400)
+      .send({ message: "Token không hợp lệ hoặc đã hết hạn" });
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -331,4 +418,6 @@ module.exports = {
   update,
   changePassword,
   verifyEmail,
+  forgotPassword,
+  resetPassword,
 };

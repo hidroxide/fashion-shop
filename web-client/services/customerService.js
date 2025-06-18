@@ -35,6 +35,18 @@ const customerService = {
       params: { token },
     });
   },
+
+  forgotPassword: async (data) => {
+    return await axiosClient.post("/customer/forgot-password", data);
+  },
+
+  resetPassword: async ({ token, new_password, confirm_password }) => {
+    return await axiosClient.put("/customer/reset-password", {
+      token,
+      new_password,
+      confirm_password,
+    });
+  },
 };
 
 export default customerService;
