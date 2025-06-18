@@ -11,7 +11,7 @@ const {
   resetPasswordTemplate,
 } = require("../utils/sendEmail");
 
-const register = async (req, res, next) => {
+let register = async (req, res, next) => {
   let email = req.body.email;
   if (email === undefined)
     return res.status(400).send({ message: "Vui lòng nhập Email của bạn" });
@@ -69,7 +69,7 @@ const register = async (req, res, next) => {
   }
 };
 
-const login = async (req, res, next) => {
+let login = async (req, res, next) => {
   let email = req.body.email;
   if (email === undefined)
     return res.status(400).send({ message: "Email hoặc Mật khẩu không đúng" });
@@ -130,12 +130,12 @@ const login = async (req, res, next) => {
   }
 };
 
-const logout = async (req, res, next) => {
+let logout = async (req, res, next) => {
   res.clearCookie("refresh_token");
   return res.send({ message: "Đăng xuất thành công" });
 };
 
-const refreshAccessToken = async (req, res, next) => {
+let refreshAccessToken = async (req, res, next) => {
   const refreshToken = req.cookies?.refresh_token;
   if (refreshToken === undefined)
     return res.status(400).send({ message: "Refresh Token không hợp lệ" });
@@ -175,7 +175,7 @@ const refreshAccessToken = async (req, res, next) => {
   }
 };
 
-const getInfor = async (req, res, next) => {
+let getInfor = async (req, res, next) => {
   const customerId = req.token.customer_id;
   if (!customerId)
     return res.status(400).send({ message: "Access Token không hợp lệ" });
@@ -207,7 +207,7 @@ const getInfor = async (req, res, next) => {
   }
 };
 
-const update = async (req, res, next) => {
+let update = async (req, res, next) => {
   const user_id = req.token.customer_id;
   if (!user_id)
     return res.status(400).send({ message: "Access Token không hợp lệ" });
@@ -251,7 +251,7 @@ const update = async (req, res, next) => {
   }
 };
 
-const changePassword = async (req, res, next) => {
+let changePassword = async (req, res, next) => {
   const user_id = req.token.customer_id;
   if (!user_id)
     return res.status(400).send({ message: "Access Token không hợp lệ" });
@@ -292,7 +292,7 @@ const changePassword = async (req, res, next) => {
   }
 };
 
-const verifyEmail = async (req, res) => {
+let verifyEmail = async (req, res) => {
   const { token } = req.query;
 
   if (!token) return res.status(400).send({ message: "Token không hợp lệ" });
