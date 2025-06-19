@@ -87,9 +87,9 @@ const ResetPasswordPage = () => {
             placeholder="Xác nhận mật khẩu mới"
           />
         </div>
-        <div>
-          <Button type="primary" htmlType="submit" block loading={isSubmitting}>
-            Đặt lại mật khẩu
+        <div className={"btn-container" + (isSubmitting ? " btn-loading" : "")}>
+          <Button htmlType="submit" loading={isSubmitting}>
+            {!isSubmitting && "Đặt lại mật khẩu"}
           </Button>
         </div>
       </form>
