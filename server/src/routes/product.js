@@ -26,4 +26,6 @@ router.get(
   ProductController.listSize
 );
 
+router.get("/customer/search", ProductController.searchCustomerSide);
+
 module.exports = router;

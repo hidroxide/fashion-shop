@@ -24,7 +24,7 @@ const CollectionPage = () => {
           category && category !== "undefined"
             ? {
                 title: "Danh mục",
-                href: `/collections?category=${category}`,
+                href: `/products?category=${category}`,
               }
             : { title: "Tất cả" },
           category && category !== "undefined" && { title: categoryTitle },
@@ -34,15 +34,17 @@ const CollectionPage = () => {
         <div className="product-list row pt-4">
           {productList && productList.length ? (
             productList.map((product, index) => {
+              const defaultVariant = product.variants?.[0];
+
               return (
                 <ProductItem
                   key={index}
                   product_id={product.product_id}
                   name={product.product_name}
-                  img={product.product_image}
-                  price={formatPrice(product.price)}
-                  colour_id={product.colour_id}
-                  sizes={product.sizes}
+                  img={defaultVariant?.product_image}
+                  price={formatPrice(defaultVariant?.price)}
+                  colour_id={defaultVariant?.colour_id}
+                  sizes={defaultVariant?.sizes}
                   rating={product.rating}
                   sold={product.sold}
                   feedback_quantity={product.feedback_quantity}

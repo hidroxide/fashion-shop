@@ -153,7 +153,7 @@ const Header = () => {
                           <li key={index} className="w-100">
                             <Link
                               href={{
-                                pathname: "/collections",
+                                pathname: "/products",
                                 query: {
                                   category: category.category_id,
                                 },
