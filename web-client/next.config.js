@@ -1,13 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    reactStrictMode: false,
-    images: {
-        remotePatterns: [
-            {
-                hostname: process.env.BASE_BACKEND_URL
-            }
-        ]
-    }
+  reactStrictMode: false,
+  images: {
+    domains: ["res.cloudinary.com"], // Thêm domain Cloudinary ở đây
+  },
 };
 
 module.exports = nextConfig;

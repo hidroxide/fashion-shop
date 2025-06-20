@@ -75,12 +75,9 @@ INSERT INTO `colours` (`colour_id`, `colour_name`) VALUES
 (1, 'Trắng'),
 (2, 'Đen'),
 (3, 'Xám'),
-(4, 'Xám Đen'),
-(5, 'Xanh Đậm'),
-(6, 'Xanh Nhạt'),
-(7, 'Xanh Aqua'),
-(8, 'Xanh Navy'),
-(9, 'Xanh Rêu');
+(4, 'Xám Tiêu'),
+(5, 'Xanh Navy'),
+(6, 'Xanh Rêu');
 
 --
 -- Dumping data for table `sizes`
@@ -91,10 +88,12 @@ INSERT INTO `sizes` (`size_id`, `size_name`) VALUES
 (2, 'M'),
 (3, 'L'),
 (4, 'XL'),
-(5, '2XL'),
-(6, '3XL'),
-(7, '29'),
-(8, '30');
+(5, 'XXL'),
+(6, '29'),
+(7, '30'),
+(8, '31'),
+(9, '32'),
+(10, '33');
 
 --
 -- Dumping data for table `products`
