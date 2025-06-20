@@ -11,7 +11,14 @@ const Product_Image = sequelize.define(
       autoIncrement: true,
       primaryKey: true,
     },
-    path: DataTypes.STRING,
+    path: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    public_id: {
+      type: DataTypes.STRING, // Cloudinary public ID
+      allowNull: true,
+    },
   },
   {
     tableName: "product_images",
@@ -19,6 +26,7 @@ const Product_Image = sequelize.define(
   }
 );
 
+// Associations
 Product_Variant.hasMany(Product_Image, {
   foreignKey: {
     name: "product_variant_id",

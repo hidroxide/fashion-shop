@@ -9,46 +9,57 @@ const uploadImage = require("../midlewares/uploadImage");
 let create = async (req, res, next) => {
   uploadImage(req, res, async (err) => {
     if (err) {
-      console.log(err);
-      return res.status(400).send(err);
+      console.error(err);
+      return res.status(400).send(err.message || "Lỗi upload ảnh");
     }
-    let quantity = parseInt(req.body.quantity);
-    if (quantity === undefined)
-      return res.status(400).send("Trường quantity không tồn tại");
-    let product_id = parseInt(req.body.product_id);
-    if (product_id === undefined)
-      return res.status(400).send("Trường product_id không tồn tại");
-    let colour_id = parseInt(req.body.colour_id);
-    if (colour_id === undefined)
-      return res.status(400).send("Trường colour_id không tồn tại");
-    let size_id = parseInt(req.body.size_id);
-    if (size_id === undefined)
-      return res.status(400).send("Trường size_id không tồn tại");
-    let files = req.files;
-    if (files === undefined)
-      return res.status(400).send("Trường files không tồn tại");
+
+    const { quantity, product_id, colour_id, size_id } = req.body;
+
+    // Chuyển đổi kiểu dữ liệu và kiểm tra hợp lệ
+    const quantityNum = parseInt(quantity);
+    const productIdNum = parseInt(product_id);
+    const colourIdNum = parseInt(colour_id);
+    const sizeIdNum = parseInt(size_id);
+
+    if (isNaN(quantityNum))
+      return res.status(400).send("Trường quantity không hợp lệ");
+    if (isNaN(productIdNum))
+      return res.status(400).send("Trường product_id không hợp lệ");
+    if (isNaN(colourIdNum))
+      return res.status(400).send("Trường colour_id không hợp lệ");
+    if (isNaN(sizeIdNum))
+      return res.status(400).send("Trường size_id không hợp lệ");
+
+    const files = req.files;
+    if (!files || files.length === 0) {
+      return res.status(400).send("Chưa có file ảnh nào được tải lên");
+    }
 
     try {
-      let data = {
-        quantity,
-        product_id,
-        colour_id,
-        size_id,
-      };
-      let newProductVariant = await Product_Variant.create(data);
-      for (let file of files) {
-        let data = {
-          path:
-            "http://localhost:8080/static/images/" +
-            file.path.slice(-40, file.path.length),
+      // Tạo biến thể sản phẩm
+      const newProductVariant = await Product_Variant.create({
+        quantity: quantityNum,
+        product_id: productIdNum,
+        colour_id: colourIdNum,
+        size_id: sizeIdNum,
+      });
+
+      // Tạo bản ghi hình ảnh (lưu cả path và public_id từ Cloudinary)
+      for (const file of files) {
+        await Product_Image.create({
+          path: file.path, // URL trả về từ Cloudinary
+          public_id: file.filename, // public_id của Cloudinary (dùng khi xóa)
           product_variant_id: newProductVariant.product_variant_id,
-        };
-        let newProductImage = await Product_Image.create(data);
+        });
       }
-      return res.send(newProductVariant);
+
+      return res.status(201).json({
+        message: "Tạo biến thể sản phẩm thành công",
+        product_variant: newProductVariant,
+      });
     } catch (err) {
-      console.log(err);
-      return res.status(500).send("Gặp lỗi khi tải dữ liệu vui lòng thử lại");
+      console.error(err);
+      return res.status(500).send("Gặp lỗi khi tải dữ liệu. Vui lòng thử lại.");
     }
   });
 };
@@ -56,49 +67,74 @@ let create = async (req, res, next) => {
 let update = async (req, res, next) => {
   uploadImage(req, res, async (err) => {
     if (err) {
-      console.log(err);
-      return res.status(400).send(err);
+      console.error(err);
+      return res.status(400).send(err.message || "Lỗi upload ảnh");
     }
-    let product_variant_id = parseInt(req.body.product_variant_id);
-    if (product_variant_id === undefined)
-      return res.status(400).send("Trường product_variant_id không tồn tại");
-    let quantity = parseInt(req.body.quantity);
-    if (quantity === undefined)
-      return res.status(400).send("Trường quantity không tồn tại");
-    let files = req.files;
-    if (files === undefined)
-      return res.status(400).send("Trường files không tồn tại");
+
+    const product_variant_id = parseInt(req.body.product_variant_id);
+    const quantity = parseInt(req.body.quantity);
+
+    if (isNaN(product_variant_id)) {
+      return res.status(400).send("Trường product_variant_id không hợp lệ");
+    }
+
+    if (isNaN(quantity)) {
+      return res.status(400).send("Trường quantity không hợp lệ");
+    }
+
+    const files = req.files;
+    if (!files || files.length === 0) {
+      return res.status(400).send("Chưa có file ảnh nào được tải lên");
+    }
 
     try {
-      let productVariant = await Product_Variant.findOne({
+      const productVariant = await Product_Variant.findOne({
         where: { product_variant_id },
-        include: { model: Product_Image, attributes: ["image_id", "path"] },
+        include: {
+          model: Product_Image,
+          attributes: ["image_id", "public_id"],
+        },
       });
-      if (!productVariant)
-        return res.status(400).send("Product Variant này không tồn tại");
 
-      for (let file of files) {
-        fileName = file.path.slice(-40, file.path.length);
-        let path = "http://localhost:8080/static/images/" + fileName;
+      if (!productVariant) {
+        return res.status(404).send("Product Variant này không tồn tại");
+      }
+
+      // ✅ XÓA ẢNH CŨ TỪ CLOUDINARY
+      for (const img of productVariant.Product_Images) {
+        if (img.public_id) {
+          try {
+            await cloudinary.uploader.destroy(img.public_id);
+          } catch (err) {
+            console.warn(
+              `Không thể xóa ảnh Cloudinary với public_id ${img.public_id}:`,
+              err.message
+            );
+          }
+        }
+        await Product_Image.destroy({ where: { image_id: img.image_id } });
+      }
+
+      // ✅ THÊM ẢNH MỚI
+      for (const file of files) {
         await Product_Image.create({
-          path,
+          path: file.path, // Cloudinary URL
+          public_id: file.filename, // Cloudinary public_id
           product_variant_id,
         });
       }
 
-      for (let { image_id, path } of productVariant.Product_Images) {
-        let directoryPath = __basedir + "\\public\\images\\";
-        let fileName = path.slice(-40, path.length);
-        fs.unlinkSync(directoryPath + fileName);
-        await Product_Image.destroy({ where: { image_id } });
-      }
-
+      // ✅ CẬP NHẬT SỐ LƯỢNG
       await productVariant.update({ quantity });
 
-      return res.send({ message: "Cập nhật biến thể sản phẩm thành công!" });
+      return res.status(200).json({
+        message: "Cập nhật biến thể sản phẩm thành công!",
+      });
     } catch (err) {
-      console.log(err);
-      return res.status(500).send("Gặp lỗi khi tải dữ liệu vui lòng thử lại");
+      console.error(err);
+      return res
+        .status(500)
+        .send("Gặp lỗi khi cập nhật dữ liệu. Vui lòng thử lại.");
     }
   });
 };
