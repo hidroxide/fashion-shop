@@ -113,32 +113,33 @@ let listAdminSide = async (req, res, next) => {
 
 let listCustomerSide = async (req, res, next) => {
   let category_id = Number(req.query.category);
-  let whereClause;
-  if (category_id != undefined && Number.isInteger(category_id))
-    whereClause = { category_id };
+  let whereClause = {};
+
+  if (!isNaN(category_id) && Number.isInteger(category_id)) {
+    whereClause.category_id = category_id;
+  }
 
   try {
-    // Lấy danh sách tất cả sản phẩm ưu tiên sản phẩm mới nhất
+    // Lấy danh sách sản phẩm mới nhất
     let listProduct = await Product.findAll({
       attributes: ["product_id"],
       order: [["created_at", "DESC"]],
       raw: true,
     });
 
-    let listProductVariant = [];
+    let productMap = new Map();
 
-    // Duyệt qua danh sách sản phẩm
     for (let { product_id } of listProduct) {
-      // Lấy danh sách tất cả các màu của sản phẩm đó
+      // Lấy các màu của sản phẩm
       let listColor = await Product_Variant.findAll({
         attributes: ["colour_id"],
         where: { product_id },
         group: ["colour_id"],
         raw: true,
       });
-      // Duyệt qua danh sách màu
+
       for (let { colour_id } of listColor) {
-        // Tìm tất cả biến thể sản phẩm có cùng màu với nhau
+        // Lấy các biến thể cùng màu
         let listProductVariantSameColour = await Product_Variant.findAll({
           attributes: ["product_variant_id", "colour_id"],
           include: [
@@ -177,39 +178,50 @@ let listCustomerSide = async (req, res, next) => {
             ],
           },
         });
-        // Convert dữ liệu
+
         if (listProductVariantSameColour.length) {
-          let productVariant = {
-            product_id: listProductVariantSameColour[0].Product.product_id,
-            product_name: listProductVariantSameColour[0].Product.product_name,
-            rating: listProductVariantSameColour[0].Product.rating,
-            sold: listProductVariantSameColour[0].Product.sold,
-            feedback_quantity:
-              listProductVariantSameColour[0].Product.feedback_quantity,
-            product_variant_id:
-              listProductVariantSameColour[0].product_variant_id,
-            colour_id: listProductVariantSameColour[0].colour_id,
-            colour_name: listProductVariantSameColour[0].Colour.colour_name,
-            price:
-              listProductVariantSameColour[0].Product.Product_Price_Histories[0]
-                .price,
-            product_image:
-              listProductVariantSameColour[0].Product_Images[0].path,
-            sizes: [],
-            category_title:
-              listProductVariantSameColour[0].Product.Category.title,
-          };
-          // Duyệt qua danh sách biến thể sản phẩm có cùng màu để cộng dồn danh sách sizes
-          for (let { Size } of listProductVariantSameColour)
-            productVariant.sizes.push(Size.size_name);
-          listProductVariant.push(productVariant);
+          const base = listProductVariantSameColour[0];
+          const pid = base.Product.product_id;
+
+          // Nếu chưa có product trong map, thêm mới
+          if (!productMap.has(pid)) {
+            productMap.set(pid, {
+              product_id: pid,
+              product_name: base.Product.product_name,
+              rating: base.Product.rating,
+              sold: base.Product.sold,
+              feedback_quantity: base.Product.feedback_quantity,
+              category_title: base.Product.Category.title,
+              variants: [],
+            });
+          }
+
+          // Tạo danh sách size duy nhất cho màu hiện tại
+          const sizes = [
+            ...new Set(
+              listProductVariantSameColour
+                .map((v) => v.Size?.size_name)
+                .filter(Boolean)
+            ),
+          ];
+
+          // Thêm biến thể theo màu
+          productMap.get(pid).variants.push({
+            product_variant_id: base.product_variant_id,
+            colour_id: base.colour_id,
+            colour_name: base.Colour.colour_name,
+            price: base.Product.Product_Price_Histories[0]?.price || 0,
+            product_image: base.Product_Images[0]?.path || "",
+            sizes,
+          });
         }
       }
     }
-    return res.send(listProductVariant);
+
+    return res.send([...productMap.values()]);
   } catch (err) {
-    console.log(err);
-    return res.status(500).send("Gặp lỗi khi tải dữ liệu vui lòng thử lại");
+    console.error(err);
+    return res.status(500).send("Gặp lỗi khi tải dữ liệu, vui lòng thử lại");
   }
 };
 

@@ -115,10 +115,10 @@ const ProductDetailPage = () => {
         className="custom-breadcrumb"
         items={[
           { title: "Trang chủ", href: "/" },
-          { title: "Danh mục", href: "/collections" },
+          { title: "Danh mục", href: "/products" },
           categoryId && {
             title: categoryTitle,
-            href: `/collections?category=${categoryId}`,
+            href: `/products?category=${categoryId}`,
           },
           { title: productName },
         ].filter(Boolean)}
