@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Empty, Breadcrumb } from "antd";
 import { useRouter } from "next/router";
 
-import ProductItem from "@/components/productPage/productItem";
+import ProductItem from "@/components/productsPage/productItem";
 import { formatPrice } from "@/helpers/format";
 import queries from "@/queries";
 
