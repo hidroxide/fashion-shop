@@ -7,7 +7,7 @@ import { formatRate } from "@/helpers/format";
 
 const ProductItem = (props) => {
   return (
-    <div className="product-item col-6 col-md-4 col-lg-3">
+    <div className="product-item col-6 col-md-4 col-lg-2">
       <Link
         href={{
           pathname: `/product/${props.product_id}`,
@@ -16,26 +16,6 @@ const ProductItem = (props) => {
       >
         <div className="product-thumbnails position-relative">
           <Image className="img" src={props.img} fill alt={props.name} />
-          <div className="position-absolute rate-box">
-            <span className="d-flex justify-content-start align-items-center mt-1">
-              <span
-                className="rating-box text-dark px-2 py-1 rounded d-flex align-items-center gap-1"
-                style={{
-                  backgroundColor: "#fff9e6",
-                  border: "1px solid #ffdd57",
-                }}
-              >
-                <span className="rating d-flex justify-content-start align-items-center">
-                  {formatRate(props.rating)}
-                </span>
-                <StarFilled className="d-flex justify-content-start align-items-center text-warning" />
-              </span>
-
-              <span className="sold_quantity d-flex justify-content-start align-items-center ms-2">
-                Đã bán {props.sold}
-              </span>
-            </span>
-          </div>
         </div>
       </Link>
       <div className="infor-product">
@@ -49,6 +29,13 @@ const ProductItem = (props) => {
         </Link>
         <div className="d-flex justify-content-start">
           <p className="price-after text-danger fw-bold">{props.price}đ</p>
+        </div>
+        <div className="rate-box d-flex justify-content-start align-items-center mt-1">
+          <span className="rating-box text-dark px-2 py-1 rounded d-flex align-items-center gap-1">
+            <span className="rating">{formatRate(props.rating)}</span>
+            <StarFilled className="text-warning" />
+          </span>
+          <span className="sold_quantity ms-2">Đã bán {props.sold}</span>
         </div>
       </div>
     </div>
