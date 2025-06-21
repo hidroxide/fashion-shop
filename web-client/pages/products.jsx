@@ -2,11 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { Empty, Breadcrumb } from "antd";
 import { useRouter } from "next/router";
 
-import ProductItem from "@/components/collectionPage/productItem";
+import ProductItem from "@/components/productsPage/productItem";
 import { formatPrice } from "@/helpers/format";
 import queries from "@/queries";
 
-const CollectionPage = () => {
+const ProductsPage = () => {
   const router = useRouter();
   const { category } = router.query;
 
@@ -62,4 +62,4 @@ const CollectionPage = () => {
   );
 };
 
-export default CollectionPage;
+export default ProductsPage;
