@@ -5,7 +5,7 @@
 INSERT INTO `categories` (`category_id`, `title`, `level`, `parent_id`) VALUES
 (1, 'Áo Nam', 1, NULL),
 (2, 'Quần Nam', 1, NULL),
-(3, 'Nón', 1, NULL),
+(3, 'Nón Unisex', 1, NULL),
 (4, 'Áo T-Shirt', 2, 1),
 (5, 'Áo Polo', 2, 1),
 (6, 'Áo Sơ Mi', 2, 1),
@@ -22,10 +22,7 @@ INSERT INTO `categories` (`category_id`, `title`, `level`, `parent_id`) VALUES
 INSERT INTO `colours` (`colour_id`, `colour_name`) VALUES
 (1, 'Trắng'),
 (2, 'Đen'),
-(3, 'Xám'),
-(4, 'Xám Tiêu'),
-(5, 'Xanh Navy'),
-(6, 'Xanh Rêu');
+(3, 'Xám');
 
 --
 -- Dumping data for table `sizes`
