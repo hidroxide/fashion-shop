@@ -6,7 +6,7 @@ import ProductItem from "@/components/productPage/productItem";
 import { formatPrice } from "@/helpers/format";
 import queries from "@/queries";
 
-const ProductPage = () => {
+const ProductsPage = () => {
   const router = useRouter();
   const { category } = router.query;
 
@@ -62,4 +62,4 @@ const ProductPage = () => {
   );
 };
 
-export default ProductPage;
+export default ProductsPage;
