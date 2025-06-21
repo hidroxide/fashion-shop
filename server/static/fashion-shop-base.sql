@@ -5,7 +5,7 @@
 INSERT INTO `categories` (`category_id`, `title`, `level`, `parent_id`) VALUES
 (1, 'Áo Nam', 1, NULL),
 (2, 'Quần Nam', 1, NULL),
-(3, 'Nón', 1, NULL),
+(3, 'Nón Unisex', 1, NULL),
 (4, 'Áo T-Shirt', 2, 1),
 (5, 'Áo Polo', 2, 1),
 (6, 'Áo Sơ Mi', 2, 1),
