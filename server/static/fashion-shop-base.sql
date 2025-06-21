@@ -22,10 +22,7 @@ INSERT INTO `categories` (`category_id`, `title`, `level`, `parent_id`) VALUES
 INSERT INTO `colours` (`colour_id`, `colour_name`) VALUES
 (1, 'Trắng'),
 (2, 'Đen'),
-(3, 'Xám'),
-(4, 'Xám Tiêu'),
-(5, 'Xanh Navy'),
-(6, 'Xanh Rêu');
+(3, 'Xám');
 
 --
 -- Dumping data for table `sizes`
