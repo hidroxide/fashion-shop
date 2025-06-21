@@ -379,116 +379,115 @@ let listSize = async (req, res, next) => {
   }
 };
 
-let searchCustomerSide = async (req, res, next) => {
+const searchCustomerSide = async (req, res, next) => {
   const category_id = Number(req.query.category);
   const searchKeyword = req.query.search;
-  const whereClause = {};
+
+  const productWhere = {};
 
   if (!isNaN(category_id) && Number.isInteger(category_id)) {
-    whereClause.category_id = category_id;
+    productWhere.category_id = category_id;
   }
 
   if (searchKeyword && typeof searchKeyword === "string") {
-    whereClause.product_name = { [Op.like]: `%${searchKeyword}%` };
+    productWhere.product_name = { [Op.like]: `%${searchKeyword}%` };
   }
 
   try {
-    const listProduct = await Product.findAll({
-      attributes: ["product_id"],
-      where: whereClause, // lọc ngay từ đầu
-      order: [["created_at", "DESC"]],
-      raw: true,
+    const productVariants = await Product_Variant.findAll({
+      attributes: ["product_variant_id", "colour_id", "product_id"],
+      include: [
+        {
+          model: Product,
+          attributes: [
+            "product_id",
+            "product_name",
+            "rating",
+            "sold",
+            "feedback_quantity",
+            "category_id",
+          ],
+          where: productWhere,
+          include: [
+            {
+              model: Product_Price_History,
+              attributes: ["price"],
+              separate: true,
+              order: [["created_at", "DESC"]],
+            },
+            {
+              model: Category,
+              attributes: ["title"],
+            },
+          ],
+        },
+        {
+          model: Colour,
+          attributes: ["colour_name"],
+        },
+        {
+          model: Size,
+          attributes: ["size_name"],
+        },
+        {
+          model: Product_Image,
+          attributes: ["path"],
+        },
+      ],
+      where: {
+        state: true,
+        quantity: {
+          [Op.gt]: 0,
+        },
+      },
+      raw: false,
     });
 
     const productMap = new Map();
 
-    for (const { product_id } of listProduct) {
-      const listColor = await Product_Variant.findAll({
-        attributes: ["colour_id"],
-        where: { product_id },
-        group: ["colour_id"],
-        raw: true,
-      });
+    for (const variant of productVariants) {
+      const product = variant.Product;
+      if (!product) continue;
 
-      for (const { colour_id } of listColor) {
-        const listProductVariantSameColour = await Product_Variant.findAll({
-          attributes: ["product_variant_id", "colour_id"],
-          include: [
-            {
-              model: Product,
-              attributes: [
-                "product_id",
-                "product_name",
-                "rating",
-                "sold",
-                "feedback_quantity",
-              ],
-              include: [
-                {
-                  model: Product_Price_History,
-                  attributes: ["price"],
-                  separate: true,
-                  order: [["created_at", "DESC"]],
-                },
-                {
-                  model: Category,
-                  attributes: ["title"],
-                },
-              ],
-            },
-            { model: Colour, attributes: ["colour_name"] },
-            { model: Size, attributes: ["size_name"] },
-            { model: Product_Image, attributes: ["path"] },
-          ],
-          where: {
-            [Op.and]: [
-              { colour_id },
-              { state: true },
-              { quantity: { [Op.gt]: 0 } },
-            ],
-          },
+      const pid = product.product_id;
+
+      if (!productMap.has(pid)) {
+        productMap.set(pid, {
+          product_id: pid,
+          product_name: product.product_name,
+          rating: product.rating,
+          sold: product.sold,
+          feedback_quantity: product.feedback_quantity,
+          category_title: product.Category?.title || "",
+          variants: [],
         });
+      }
 
-        if (listProductVariantSameColour.length) {
-          const base = listProductVariantSameColour[0];
-          const pid = base.Product.product_id;
+      const variantData = {
+        product_variant_id: variant.product_variant_id,
+        colour_id: variant.colour_id,
+        colour_name: variant.Colour?.colour_name || "",
+        price: product.Product_Price_Histories?.[0]?.price || 0,
+        product_image: variant.Product_Images?.[0]?.path || "",
+        sizes: [variant.Size?.size_name].filter(Boolean),
+      };
 
-          if (!productMap.has(pid)) {
-            productMap.set(pid, {
-              product_id: pid,
-              product_name: base.Product.product_name,
-              rating: base.Product.rating,
-              sold: base.Product.sold,
-              feedback_quantity: base.Product.feedback_quantity,
-              category_title: base.Product.Category.title,
-              variants: [],
-            });
-          }
+      const existingVariant = productMap
+        .get(pid)
+        .variants.find((v) => v.colour_id === variant.colour_id);
 
-          const sizes = [
-            ...new Set(
-              listProductVariantSameColour
-                .map((v) => v.Size?.size_name)
-                .filter(Boolean)
-            ),
-          ];
-
-          productMap.get(pid).variants.push({
-            product_variant_id: base.product_variant_id,
-            colour_id: base.colour_id,
-            colour_name: base.Colour.colour_name,
-            price: base.Product.Product_Price_Histories[0]?.price || 0,
-            product_image: base.Product_Images[0]?.path || "",
-            sizes,
-          });
-        }
+      if (existingVariant) {
+        existingVariant.sizes.push(...variantData.sizes);
+        existingVariant.sizes = [...new Set(existingVariant.sizes)];
+      } else {
+        productMap.get(pid).variants.push(variantData);
       }
     }
 
     return res.send([...productMap.values()]);
   } catch (err) {
-    console.error(err);
-    return res.status(500).send("Gặp lỗi khi tải dữ liệu, vui lòng thử lại");
+    console.error("Lỗi khi tìm kiếm sản phẩm:", err);
+    return res.status(500).send("Gặp lỗi khi tìm kiếm, vui lòng thử lại sau.");
   }
 };
 
