@@ -1,12 +1,16 @@
 import Image from "next/image";
+import Link from "next/link";
+import logo from "@/public/img/logo-1.png";
 
 const Footer = () => {
   return (
     <footer className="footer d-none d-md-block">
       <div className="container g-0">
         <div className="footer-sidebar row g-0">
+          <Link className="logo" href="/">
+            <Image src={logo} width={100} height={50} alt="" />
+          </Link>
           <div className="footer-comment col-lg-4 pe-lg-2">
-            <h4>ELEVENT lắng nghe bạn!</h4>
             <p>
               Chúng tôi luôn trân trọng và mong đợi nhận được mọi ý kiến đóng
               góp từ khách hàng để có thể nâng cấp trải nghiệm dịch vụ và sản
