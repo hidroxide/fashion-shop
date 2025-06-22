@@ -15,7 +15,7 @@ const Section = () => {
   return (
     <div className="section w-100">
       <div className="logo-box text-center">
-        <img className="logo" src="http://localhost:3000/img/logo.png" alt="" />
+        <img className="logo" src="/img/logo.png" alt="" />
       </div>
       <ul className="menu position-relative">
         {menu &&
