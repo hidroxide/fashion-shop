@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Empty, Breadcrumb } from "antd";
+import { Empty, Breadcrumb, Select } from "antd";
 import { useRouter } from "next/router";
 
 import ProductItem from "@/components/productsPage/productItem";
@@ -8,10 +8,10 @@ import queries from "@/queries";
 
 const ProductsPage = () => {
   const router = useRouter();
-  const { category, search } = router.query;
+  const { category, search, sort } = router.query;
 
   const { isError, error, data } = useQuery(
-    queries.products.list({ category, search })
+    queries.products.list({ category, search, sort })
   );
   if (isError) console.log(error);
   const productList = data?.data;
@@ -23,15 +23,35 @@ const ProductsPage = () => {
         className="custom-breadcrumb"
         items={[
           { title: "Trang chủ", href: "/" },
-          category && category !== "undefined"
-            ? {
-                title: "Danh mục",
-                href: `/products?category=${category}`,
-              }
-            : { title: `Kết quả tìm kiếm: ${search}` },
-          category && category !== "undefined" && { title: categoryTitle },
-        ].filter(Boolean)}
+          search
+            ? { title: `Kết quả tìm kiếm: "${search}"` }
+            : category && category !== "undefined"
+            ? { title: `Danh mục: ${categoryTitle || "..."}` }
+            : { title: "Tất cả sản phẩm" },
+        ]}
       />
+
+      <div className="d-flex justify-content-end my-3">
+        <Select
+          value={sort || ""}
+          style={{ width: 200 }}
+          onChange={(value) => {
+            router.push({
+              pathname: "/products",
+              query: {
+                ...router.query,
+                sort: value || undefined, // loại bỏ nếu rỗng
+              },
+            });
+          }}
+          options={[
+            { value: "", label: "Sắp xếp mặc định" },
+            { value: "asc", label: "Giá tăng dần" },
+            { value: "desc", label: "Giá giảm dần" },
+          ]}
+        />
+      </div>
+
       <div className="product-page container">
         <div className="product-list row pt-4">
           {productList && productList.length ? (
