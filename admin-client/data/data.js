@@ -1,7 +1,7 @@
 export const menu = [
   {
     title: "Thống kê",
-    href: "/order/manage",
+    href: "/overview",
     list: [],
   },
   {
