@@ -57,4 +57,14 @@ export default createQueryKeys("products", {
       queryFn: () => productService.getVariant(productId, colourId, sizeId),
     };
   },
+
+  newest: (limit = 5) => ({
+    queryKey: ["newest", limit],
+    queryFn: () => productService.getNewestProducts(limit),
+  }),
+
+  bestSelling: (limit = 5) => ({
+    queryKey: ["bestSelling", limit],
+    queryFn: () => productService.getBestSellingProducts(limit),
+  }),
 });

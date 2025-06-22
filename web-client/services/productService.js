@@ -36,6 +36,18 @@ const productService = {
       params: { search: keyword },
     });
   },
+
+  getNewestProducts: async (limit = 5) => {
+    return await axiosClient.get("/product/customer/newest", {
+      params: { limit },
+    });
+  },
+
+  getBestSellingProducts: async (limit = 5) => {
+    return await axiosClient.get("/product/customer/best-seller", {
+      params: { limit },
+    });
+  },
 };
 
 export default productService;
