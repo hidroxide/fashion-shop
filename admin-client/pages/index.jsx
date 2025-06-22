@@ -3,7 +3,7 @@ import Router from "next/router";
 
 const HomePage = () => {
   useEffect(() => {
-    Router.push("/product/manage");
+    Router.push("/overview");
   }, []);
 
   return <div className="Home"></div>;
