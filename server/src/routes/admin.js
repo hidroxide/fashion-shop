@@ -14,4 +14,8 @@ router.put("/users/:user_id", AdminController.updateUser);
 
 router.delete("/users/:user_id", AdminController.deleteUserByAdmin);
 
+router.get("/users", AdminController.listUsers);
+
+router.get("/users/:user_id", AdminController.getUserById);
+
 module.exports = router;

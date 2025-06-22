@@ -85,23 +85,15 @@ let registerUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  const user_id = req.token?.customer_id;
-  if (!user_id)
-    return res.status(401).send("Access Token không hợp lệ hoặc thiếu");
-
-  const {
-    customer_name,
-    phone_number,
-    address,
-    email,
-    new_password, // chỉ cần mật khẩu mới
-  } = req.body;
+  const { user_id } = req.params;
+  const { email, new_password, customer_name, phone_number, address } =
+    req.body;
 
   try {
     const user = await User.findOne({ where: { user_id, role_id: 2 } });
     if (!user) return res.status(404).send("Không tìm thấy người dùng");
 
-    // 1. Cập nhật email nếu có
+    // Cập nhật email nếu có
     if (email && email !== user.email) {
       const existed = await User.findOne({ where: { email, role_id: 2 } });
       if (existed)
@@ -111,13 +103,13 @@ const updateUser = async (req, res) => {
       await user.update({ email });
     }
 
-    // 2. Cập nhật mật khẩu nếu có
+    // Cập nhật mật khẩu nếu có
     if (new_password) {
       const hashed = await bcrypt.hash(new_password, 10);
       await user.update({ password: hashed });
     }
 
-    // 3. Cập nhật Customer_Info nếu có
+    // Cập nhật Customer_Info nếu có
     const customerInfo = await Customer_Info.findOne({ where: { user_id } });
     if (customerInfo) {
       await customerInfo.update({
@@ -127,10 +119,12 @@ const updateUser = async (req, res) => {
       });
     }
 
-    return res.send({ message: "Cập nhật thông tin thành công" });
+    return res.send({ message: "Cập nhật thông tin người dùng thành công" });
   } catch (err) {
-    console.log(err);
-    return res.status(500).send("Có lỗi xảy ra, vui lòng thử lại");
+    console.error(err);
+    return res
+      .status(500)
+      .send("Có lỗi xảy ra khi cập nhật thông tin người dùng");
   }
 };
 
@@ -167,7 +161,6 @@ const listUsers = async (req, res) => {
         },
       ],
       attributes: { exclude: ["password", "verify_token"] },
-      order: [["createdAt", "DESC"]],
     });
 
     return res.send({ users });
