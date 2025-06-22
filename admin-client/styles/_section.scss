@@ -1,68 +1,94 @@
 .section {
   background-color: #fff;
-  color: black;
-  box-shadow: #cccccc 6px 0px 7px -3px;
-}
+  color: #333;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
 
-.section {
   .logo-box {
     height: var(--height-header);
     position: relative;
-  }
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-  .logo-box::after {
-    content: "";
-    position: absolute;
-    width: 90%;
-    background-color: #cccccc;
-    height: 1px;
-    left: 50%;
-    bottom: 0;
-    transform: translateX(-50%);
-  }
+    &::after {
+      content: "";
+      position: absolute;
+      width: 90%;
+      background-color: #e0e0e0;
+      height: 1px;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%);
+    }
 
-  .logo {
-    width: auto;
-    max-height: var(--height-header);
+    .logo {
+      max-height: var(--height-header);
+      width: auto;
+    }
   }
 
   .menu {
-    height: calc(100vh - (var(--height-header)));
-    overflow-y: scroll;
+    height: calc(100vh - var(--height-header));
+    overflow-y: auto;
     padding: 0;
     margin: 0;
-    list-style-type: none;
+    list-style: none;
 
-    .sub-menu {
-      padding: 0;
-      right: 0;
+    .menu-item {
+      position: relative;
 
-      li {
+      > a {
+        display: block;
+        font-size: 15px;
+        font-weight: 600;
+        padding: 14px 20px;
+        text-decoration: none;
+        color: #333;
+        transition: background 0.25s ease;
+        border-bottom: 1px solid #f0f0f0;
+
+        &:hover {
+          background-color: #f5f5f5;
+        }
+      }
+
+      .sub-menu {
         list-style: none;
+        padding: 0;
+        margin: 0;
+        background: #fafafa;
+        border-left: 2px solid #1677ff;
 
-        a {
-          font-size: 12px;
-          padding: 8px 42px 8px 60px;
+        li {
+          a {
+            display: block;
+            font-size: 13px;
+            padding: 10px 20px 10px 40px;
+            text-decoration: none;
+            color: #555;
+            transition: background 0.25s ease;
+
+            &:hover {
+              background-color: #e6f0ff;
+              color: #1677ff;
+            }
+          }
         }
       }
     }
-
-    .menu-item a {
-      font-size: 14px;
-      padding: 12px 42px;
-      display: inline-block;
-      text-decoration: none;
-      color: black;
-      transition: all 0.2s ease;
-    }
-
-    .menu-item a:hover {
-      background-color: #ccc;
-    }
   }
-}
 
-.menu::-webkit-scrollbar {
-  width: 0.2em;
-  background-color: #f5f5f5;
+  // Custom scrollbar
+  .menu::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .menu::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 3px;
+  }
+
+  .menu::-webkit-scrollbar-track {
+    background-color: #f5f5f5;
+  }
 }
