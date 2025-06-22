@@ -129,15 +129,10 @@ const updateUser = async (req, res) => {
 };
 
 const deleteUserByAdmin = async (req, res) => {
-  const admin_id = req.token?.customer_id;
   const { user_id } = req.params;
 
   try {
-    const admin = await User.findOne({ where: { user_id: admin_id } });
-    if (!admin || admin.role_id !== 1)
-      return res.status(403).send("Bạn không có quyền thực hiện thao tác này");
-
-    const user = await User.findOne({ where: { user_id } });
+    const user = await User.findOne({ where: { user_id, role_id: 2 } }); // chỉ xoá user có role_id = 2
     if (!user) return res.status(404).send("Người dùng không tồn tại");
 
     await Customer_Info.destroy({ where: { user_id } });

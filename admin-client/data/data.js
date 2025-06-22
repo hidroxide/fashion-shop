@@ -21,7 +21,7 @@ export const menu = [
   },
   {
     title: "Quản lý người dùng",
-    href: "/order/manage",
+    href: "/user/manage",
     list: [],
   },
 ];
