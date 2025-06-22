@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { FaAngleDown, FaShoppingCart } from "react-icons/fa";
-import { AutoComplete } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+import { AutoComplete, Input, Button } from "antd";
 
 import logo from "@/public/img/logo.png";
 import queries from "@/queries";
@@ -224,18 +225,56 @@ const Header = () => {
             })}
         </ul>
 
-        <div className="search-box px-2" style={{ width: "300px" }}>
+        <div className="search-box px-2 d-flex align-items-center">
           <AutoComplete
-            style={{ width: "100%" }}
-            placeholder="Tìm kiếm"
+            style={{ flex: 1, width: "300px" }}
             options={options}
             value={searchValue}
             onChange={(val) => setSearchValue(val)}
             onSearch={handleSearch}
             onSelect={handleSelect}
-            allowClear
             optionLabelProp="label"
             filterOption={false}
+          >
+            <Input
+              size="medium"
+              allowClear
+              placeholder="Tìm kiếm"
+              onPressEnter={(e) => {
+                const value = e.target.value.trim();
+                if (value) {
+                  router.push({
+                    pathname: "/products",
+                    query: { search: value },
+                  });
+                  setOptions([]);
+                }
+              }}
+            />
+          </AutoComplete>
+          <Button
+            type="default"
+            size="medium"
+            icon={
+              <SearchOutlined style={{ fontSize: "14px", color: "#000" }} />
+            }
+            className="ms-2"
+            style={{
+              background: "#fff",
+              border: "1px solid #D9D9D9",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onClick={() => {
+              if (searchValue.trim()) {
+                router.push({
+                  pathname: "/products",
+                  query: { search: searchValue.trim() },
+                });
+                setOptions([]);
+              }
+            }}
           />
         </div>
 
