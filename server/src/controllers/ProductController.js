@@ -519,6 +519,233 @@ const searchCustomerSide = async (req, res, next) => {
   }
 };
 
+const getNewestProducts = async (req, res, next) => {
+  const limit = parseInt(req.query.limit) || 5;
+
+  try {
+    const productVariants = await Product_Variant.findAll({
+      attributes: [
+        "product_variant_id",
+        "product_id",
+        "colour_id",
+        "size_id",
+        "quantity",
+        "state",
+      ],
+      include: [
+        {
+          model: Product,
+          attributes: [
+            "product_id",
+            "product_name",
+            "rating",
+            "sold",
+            "feedback_quantity",
+            "category_id",
+            "created_at",
+          ],
+          include: [
+            {
+              model: Product_Price_History,
+              attributes: ["price"],
+              separate: true,
+              order: [["created_at", "DESC"]],
+            },
+            {
+              model: Category,
+              attributes: ["title"],
+            },
+          ],
+        },
+        {
+          model: Colour,
+          attributes: ["colour_id", "colour_name"],
+        },
+        {
+          model: Size,
+          attributes: ["size_id", "size_name"],
+        },
+        {
+          model: Product_Image,
+          attributes: ["path"],
+        },
+      ],
+      where: {
+        state: true,
+        quantity: { [Op.gt]: 0 },
+      },
+      order: [[{ model: Product }, "created_at", "DESC"]],
+    });
+
+    const productMap = new Map();
+
+    for (const variant of productVariants) {
+      const product = variant.Product;
+      if (!product) continue;
+
+      const pid = product.product_id;
+
+      if (!productMap.has(pid)) {
+        productMap.set(pid, {
+          product_id: pid,
+          product_name: product.product_name,
+          rating: product.rating,
+          sold: product.sold,
+          feedback_quantity: product.feedback_quantity,
+          category_title: product.Category?.title || "",
+          variants: [],
+        });
+      }
+
+      const variantList = productMap.get(pid).variants;
+      const existing = variantList.find(
+        (v) => v.colour_id === variant.colour_id
+      );
+
+      const sizeName = variant.Size?.size_name;
+      const image = variant.Product_Images?.[0]?.path || "";
+      const price = product.Product_Price_Histories?.[0]?.price || 0;
+
+      if (existing) {
+        if (sizeName && !existing.sizes.includes(sizeName)) {
+          existing.sizes.push(sizeName);
+        }
+      } else {
+        variantList.push({
+          product_variant_id: variant.product_variant_id,
+          colour_id: variant.colour_id,
+          colour_name: variant.Colour?.colour_name || "",
+          price,
+          product_image: image,
+          sizes: sizeName ? [sizeName] : [],
+        });
+      }
+    }
+
+    // Lấy đúng số lượng sản phẩm limit
+    const result = [...productMap.values()].slice(0, limit);
+
+    return res.send(result);
+  } catch (err) {
+    console.error("Lỗi khi tải sản phẩm mới:", err);
+    return res.status(500).send("Gặp lỗi khi tải sản phẩm mới");
+  }
+};
+
+const getBestSellingProducts = async (req, res, next) => {
+  const limit = parseInt(req.query.limit) || 5;
+
+  try {
+    const productVariants = await Product_Variant.findAll({
+      attributes: [
+        "product_variant_id",
+        "product_id",
+        "colour_id",
+        "size_id",
+        "quantity",
+        "state",
+      ],
+      include: [
+        {
+          model: Product,
+          attributes: [
+            "product_id",
+            "product_name",
+            "rating",
+            "sold",
+            "feedback_quantity",
+            "category_id",
+          ],
+          where: {
+            sold: { [Op.gt]: 0 }, // 👉 chỉ lấy sản phẩm bán được
+          },
+          include: [
+            {
+              model: Product_Price_History,
+              attributes: ["price"],
+              separate: true,
+              order: [["created_at", "DESC"]],
+            },
+            {
+              model: Category,
+              attributes: ["title"],
+            },
+          ],
+        },
+        {
+          model: Colour,
+          attributes: ["colour_id", "colour_name"],
+        },
+        {
+          model: Size,
+          attributes: ["size_id", "size_name"],
+        },
+        {
+          model: Product_Image,
+          attributes: ["path"],
+        },
+      ],
+      where: {
+        state: true,
+        quantity: { [Op.gt]: 0 },
+      },
+      order: [[{ model: Product }, "sold", "DESC"]],
+    });
+
+    const productMap = new Map();
+
+    for (const variant of productVariants) {
+      const product = variant.Product;
+      if (!product) continue;
+
+      const pid = product.product_id;
+
+      if (!productMap.has(pid)) {
+        productMap.set(pid, {
+          product_id: pid,
+          product_name: product.product_name,
+          rating: product.rating,
+          sold: product.sold,
+          feedback_quantity: product.feedback_quantity,
+          category_title: product.Category?.title || "",
+          variants: [],
+        });
+      }
+
+      const variantList = productMap.get(pid).variants;
+      const existing = variantList.find(
+        (v) => v.colour_id === variant.colour_id
+      );
+
+      const sizeName = variant.Size?.size_name;
+      const image = variant.Product_Images?.[0]?.path || "";
+      const price = product.Product_Price_Histories?.[0]?.price || 0;
+
+      if (existing) {
+        if (sizeName && !existing.sizes.includes(sizeName)) {
+          existing.sizes.push(sizeName);
+        }
+      } else {
+        variantList.push({
+          product_variant_id: variant.product_variant_id,
+          colour_id: variant.colour_id,
+          colour_name: variant.Colour?.colour_name || "",
+          price,
+          product_image: image,
+          sizes: sizeName ? [sizeName] : [],
+        });
+      }
+    }
+
+    const result = [...productMap.values()].slice(0, limit);
+
+    return res.send(result);
+  } catch (err) {
+    console.error("Lỗi khi tải sản phẩm bán chạy:", err);
+    return res.status(500).send("Gặp lỗi khi tải sản phẩm bán chạy");
+  }
+};
+
 module.exports = {
   create,
   update,
@@ -529,4 +756,6 @@ module.exports = {
   listColour,
   listSize,
   searchCustomerSide,
+  getNewestProducts,
+  getBestSellingProducts,
 };
