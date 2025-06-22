@@ -99,7 +99,7 @@ const revenueByCategory = async (req, res) => {
                       include: [
                         {
                           model: Category,
-                          attributes: ["title"],
+                          attributes: ["title", "category_id"], // ✅ Thêm category_id
                         },
                       ],
                     },
@@ -115,10 +115,20 @@ const revenueByCategory = async (req, res) => {
           col("Order->Order_Items->product_variant->Product->Category.title"),
           "label",
         ],
+        [
+          col(
+            "Order->Order_Items->product_variant->Product->Category.category_id"
+          ),
+          "category_id",
+        ], // ✅ Bổ sung column gây lỗi
         [fn("SUM", col("Order->Order_Items.total_value")), "total"],
       ],
-      group: ["Order->Order_Items->product_variant->Product->Category.title"],
-
+      group: [
+        col("Order->Order_Items->product_variant->Product->Category.title"),
+        col(
+          "Order->Order_Items->product_variant->Product->Category.category_id"
+        ),
+      ], // ✅ Group cả 2 cột
       raw: true,
     });
 
