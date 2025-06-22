@@ -4,6 +4,7 @@ import { Empty } from "antd";
 import Header from "@/components/Header";
 import Heading from "@/components/Heading";
 import UserAdmin from "@/components/UserManagementPage/UserAdmin";
+import Router from "next/router";
 
 const UserManagementPage = () => {
   const [userList, setUserList] = useState([]);
@@ -25,6 +26,14 @@ const UserManagementPage = () => {
     <div className="user-manager">
       <Header title="Quản lý người dùng" />
       <div className="wrapper manager-box">
+        <div className="to-add-product-page">
+          <button
+            onClick={() => Router.push("/user/create")}
+            className="to-add-product-page-btn"
+          >
+            Thêm người dùng
+          </button>
+        </div>
         <Heading title="Tất cả người dùng" />
         <div className="wrapper-user-admin table-responsive">
           <table className="table user-admin w-100">

@@ -3,6 +3,7 @@ import { FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { swtoast, swalert } from "@/mixins/swal.mixin"; // nếu bạn dùng mixin toast
 import axios from "axios";
+import Link from "next/link";
 
 const UserAdmin = ({ user, refreshUsers }) => {
   const handleDelete = async () => {
@@ -36,6 +37,9 @@ const UserAdmin = ({ user, refreshUsers }) => {
       <td className="col-phone">{user.Customer_Info?.phone_number}</td>
       <td className="col-address">{user.Customer_Info?.address}</td>
       <td className="col-action">
+        <Link href={`/user/update/${user.user_id}`}>
+          <span className="action-icon edit">Chỉnh sửa</span>
+        </Link>
         <FaTrash
           className="action-icon delete"
           onClick={handleDelete}
