@@ -28,4 +28,8 @@ router.get(
 
 router.get("/customer/search", ProductController.searchCustomerSide);
 
+router.get("/customer/newest", ProductController.getNewestProducts);
+
+router.get("/customer/best-seller", ProductController.getBestSellingProducts);
+
 module.exports = router;

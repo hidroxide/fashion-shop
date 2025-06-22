@@ -24,12 +24,15 @@ const ProductsPage = () => {
         className="custom-breadcrumb"
         items={[
           { title: "Trang chủ", href: "/" },
+          category && category !== "undefined"
+            ? { title: "Danh mục", href: "/products" }
+            : null,
           search
             ? { title: `Kết quả tìm kiếm: "${search}"` }
             : category && category !== "undefined"
-            ? { title: `Danh mục: ${categoryTitle || "..."}` }
+            ? { title: categoryTitle || "..." }
             : { title: "Tất cả sản phẩm" },
-        ]}
+        ].filter(Boolean)} // lọc bỏ null
       />
 
       <div className="d-flex justify-content-end my-3 me-4">
