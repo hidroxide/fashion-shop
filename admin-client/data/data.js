@@ -1,5 +1,10 @@
 export const menu = [
   {
+    title: "Thống kê",
+    href: "/order/manage",
+    list: [],
+  },
+  {
     title: "Quản lý danh mục",
     href: "/catalog/manage",
     list: [],
