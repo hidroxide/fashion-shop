@@ -27,6 +27,12 @@ const productService = {
       `/product-variant/customer/detail/${productId}/${colourId}/${sizeId}`
     );
   },
+
+  searchProduct: async (keyword) => {
+    return await axiosClient.get(`/product/customer/search`, {
+      params: { search: keyword },
+    });
+  },
 };
 
 export default productService;

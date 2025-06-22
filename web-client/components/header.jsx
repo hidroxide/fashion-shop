@@ -3,11 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/router";
 import { FaAngleDown, FaShoppingCart } from "react-icons/fa";
+import { AutoComplete } from "antd";
 
 import logo from "@/public/img/logo.png";
 import queries from "@/queries";
 import customerService from "@/services/customerService";
+import productService from "@/services/productService";
 import useCustomerStore from "@/store/customerStore";
 import useCartStore from "@/store/cartStore";
 import Login from "./login";
@@ -68,6 +71,57 @@ const Header = () => {
 
   const cartItems = useCartStore((state) => state.productList);
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+
+  const [searchValue, setSearchValue] = useState("");
+  const [options, setOptions] = useState([]);
+  const router = useRouter();
+
+  const handleSearch = async (value) => {
+    setSearchValue(value);
+    if (!value) {
+      setOptions([]);
+      return;
+    }
+
+    try {
+      const res = await productService.searchProduct(value);
+      const productList = res.data;
+
+      const formattedOptions = productList.map((product) => {
+        const defaultColourId = product.variants?.[0]?.colour_id || 1;
+
+        return {
+          value: `${product.product_id}|${defaultColourId}`,
+          label: (
+            <div className="d-flex align-items-center gap-2">
+              <img
+                src={product.variants?.[0]?.product_image || "/img/default.jpg"}
+                alt="thumb"
+                style={{
+                  width: "50px",
+                  height: "50px",
+                  objectFit: "cover",
+                  borderRadius: "4px",
+                }}
+              />
+              <span>{product.product_name}</span>
+            </div>
+          ),
+          product_name: product.product_name,
+        };
+      });
+
+      setOptions(formattedOptions);
+    } catch (error) {
+      console.log("Search error", error);
+    }
+  };
+
+  const handleSelect = (value) => {
+    const [productId, colourId] = value.split("|");
+    setSearchValue("");
+    router.push(`/product/${productId}?colour=${colourId}`);
+  };
 
   return (
     <div className="header-wrapper position-relation">
@@ -169,6 +223,21 @@ const Header = () => {
               );
             })}
         </ul>
+
+        <div className="search-box px-2" style={{ width: "300px" }}>
+          <AutoComplete
+            style={{ width: "100%" }}
+            placeholder="Tìm kiếm"
+            options={options}
+            value={searchValue}
+            onChange={(val) => setSearchValue(val)}
+            onSearch={handleSearch}
+            onSelect={handleSelect}
+            allowClear
+            optionLabelProp="label"
+            filterOption={false}
+          />
+        </div>
 
         <ul className="menu p-5 ms-auto">
           {!isLoggedIn ? (
