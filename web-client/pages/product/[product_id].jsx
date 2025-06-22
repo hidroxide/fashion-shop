@@ -133,8 +133,8 @@ const ProductDetailPage = () => {
             <div className="rating d-flex align-items-center">
               <span className="d-flex align-items-center">
                 <Rate disabled allowHalf value={rating && rating} />
-                <h6 className="d-inline-block">
-                  {feedbackQuantity && feedbackQuantity}
+                <h6 className="d-inline-block ms-2 mb-0">
+                  {formatRate(rating)} / 5
                 </h6>
               </span>
               <span style={{ margin: "2px 0 0" }}>Đã bán: {sold && sold}</span>
@@ -236,7 +236,10 @@ const ProductDetailPage = () => {
                       </h5>
                       <h5 className="rating-detail d-inline-block ms-3">
                         {rating && `${formatRate(rating)} / 5`}
-                        <span className="star-icon ms-1">
+                        <span
+                          className="star-icon ms-2"
+                          style={{ color: "#ffc107" }}
+                        >
                           <StarFilled />
                         </span>
                       </h5>
