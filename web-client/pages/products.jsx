@@ -8,9 +8,11 @@ import queries from "@/queries";
 
 const ProductsPage = () => {
   const router = useRouter();
-  const { category } = router.query;
+  const { category, search } = router.query;
 
-  const { isError, error, data } = useQuery(queries.products.list(category));
+  const { isError, error, data } = useQuery(
+    queries.products.list({ category, search })
+  );
   if (isError) console.log(error);
   const productList = data?.data;
   const categoryTitle = productList?.[0]?.category_title;
@@ -26,7 +28,7 @@ const ProductsPage = () => {
                 title: "Danh mục",
                 href: `/products?category=${category}`,
               }
-            : { title: "Tất cả" },
+            : { title: `Kết quả tìm kiếm: ${search}` },
           category && category !== "undefined" && { title: categoryTitle },
         ].filter(Boolean)}
       />

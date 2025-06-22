@@ -112,11 +112,26 @@ let listAdminSide = async (req, res, next) => {
 };
 
 const listCustomerSide = async (req, res, next) => {
-  let category_id = Number(req.query.category);
-  let whereClause = {};
+  const keyword = req.query.search;
+  const category_id = Number(req.query.category);
+  const whereClause = {};
+
+  const andConditions = [];
 
   if (!isNaN(category_id) && Number.isInteger(category_id)) {
-    whereClause.category_id = category_id;
+    andConditions.push({ category_id: category_id });
+  }
+
+  if (keyword) {
+    andConditions.push({
+      product_name: {
+        [Op.like]: `%${keyword}%`,
+      },
+    });
+  }
+
+  if (andConditions.length > 0) {
+    whereClause[Op.and] = andConditions;
   }
 
   try {

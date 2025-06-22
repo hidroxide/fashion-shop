@@ -1,11 +1,13 @@
 import axiosClient from "@/services/axiosClient";
 
 const productService = {
-  getProductList: async (category) => {
-    const url = category
-      ? `/product/customer/list?category=${category}`
-      : "/product/customer/list";
-    return await axiosClient.get(url);
+  getProductList: async ({ category, search }) => {
+    return await axiosClient.get("/product/customer/list", {
+      params: {
+        ...(category && { category }),
+        ...(search && { search }),
+      },
+    });
   },
 
   getDetail: async (productId) => {

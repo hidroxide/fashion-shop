@@ -4,10 +4,11 @@ import feedbackService from "@/services/feedbackService";
 import productService from "@/services/productService";
 
 export default createQueryKeys("products", {
-  list: (category) => ({
-    queryKey: [category],
-    queryFn: () => productService.getProductList(category),
+  list: (params) => ({
+    queryKey: ["list", params],
+    queryFn: () => productService.getProductList(params),
   }),
+
   detail: (productId) => {
     return {
       queryKey: [productId],
