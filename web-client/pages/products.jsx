@@ -13,6 +13,7 @@ const ProductsPage = () => {
   const { isError, error, data } = useQuery(
     queries.products.list({ category, search, sort })
   );
+
   if (isError) console.log(error);
   const productList = data?.data;
   const categoryTitle = productList?.[0]?.category_title;
@@ -31,7 +32,7 @@ const ProductsPage = () => {
         ]}
       />
 
-      <div className="d-flex justify-content-end my-3">
+      <div className="d-flex justify-content-end my-3 me-4">
         <Select
           value={sort || ""}
           style={{ width: 200 }}
