@@ -1,7 +1,7 @@
 import { swtoast } from "@/mixins/swal.mixin.js";
 import { StarFilled } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Rate, Breadcrumb } from "antd";
+import { Rate, Breadcrumb, Tabs } from "antd";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
@@ -207,32 +207,49 @@ const ProductDetailPage = () => {
           </div>
         </div>
 
-        <div className="row product-detail">
-          <div className="col-12">
-            <h5 className="title text-center">Chi tiết sản phẩm</h5>
-            {productDescription && (
-              <div dangerouslySetInnerHTML={{ __html: productDescription }} />
-            )}
-          </div>
-        </div>
-        <div className="review-box position-relative d-flex align-items-center">
-          <div className="">
-            <h5 className="feedback_quantify-detail d-inline-block">
-              {feedbackQuantity > 0
-                ? `${feedbackQuantity} Đánh giá`
-                : "Sản phẩm hiện chưa có đánh giá"}
-            </h5>
-            {feedbackQuantity > 0 ? (
-              <h5 className="rating-detail d-inline-block">
-                {rating && `${formatRate(rating)} / 5`}
-                <span className="star-icon">
-                  <StarFilled />
-                </span>
-              </h5>
-            ) : null}
-          </div>
-        </div>
-        <FeedbackBox productId={product_id} />
+        <Tabs
+          className="custom-tabs"
+          defaultActiveKey="1"
+          items={[
+            {
+              key: "1",
+              label: "Chi tiết sản phẩm",
+              children: (
+                <div className="product-description mt-3">
+                  {productDescription && (
+                    <div
+                      dangerouslySetInnerHTML={{ __html: productDescription }}
+                    />
+                  )}
+                </div>
+              ),
+            },
+            {
+              key: "2",
+              label: `Đánh giá (${feedbackQuantity || 0})`,
+              children: (
+                <>
+                  {feedbackQuantity > 0 ? (
+                    <div className="mb-3">
+                      <h5 className="feedback_quantify-detail d-inline-block">
+                        {feedbackQuantity} Đánh giá
+                      </h5>
+                      <h5 className="rating-detail d-inline-block ms-3">
+                        {rating && `${formatRate(rating)} / 5`}
+                        <span className="star-icon ms-1">
+                          <StarFilled />
+                        </span>
+                      </h5>
+                    </div>
+                  ) : (
+                    <p className="mt-3">Sản phẩm hiện chưa có đánh giá</p>
+                  )}
+                  <FeedbackBox productId={product_id} />
+                </>
+              ),
+            },
+          ]}
+        />
       </div>
     </>
   );
