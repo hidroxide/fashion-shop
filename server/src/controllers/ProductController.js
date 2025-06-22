@@ -113,6 +113,7 @@ let listAdminSide = async (req, res, next) => {
 
 const listCustomerSide = async (req, res, next) => {
   const keyword = req.query.search;
+  const sort = req.query.sort;
   const category_id = Number(req.query.category);
   const whereClause = {};
 
@@ -226,7 +227,19 @@ const listCustomerSide = async (req, res, next) => {
       }
     }
 
-    return res.send([...productMap.values()]);
+    let result = [...productMap.values()];
+
+    if (sort === "asc") {
+      result.sort(
+        (a, b) => (a.variants[0]?.price || 0) - (b.variants[0]?.price || 0)
+      );
+    } else if (sort === "desc") {
+      result.sort(
+        (a, b) => (b.variants[0]?.price || 0) - (a.variants[0]?.price || 0)
+      );
+    }
+
+    return res.send(result);
   } catch (err) {
     console.error("Lỗi khi tải sản phẩm:", err);
     return res
