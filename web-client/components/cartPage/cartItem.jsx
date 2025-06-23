@@ -43,15 +43,15 @@ const CartItem = (props) => {
                 className="fw-bold quantity-button col-3 d-flex justify-content-between align-items-center"
                 style={{ border: "1px solid #000 ", borderRadius: "8px" }}
               >
-                <PlusOutlined
-                  onClick={() => {
-                    incrementQuantity(productVariantId);
-                  }}
-                />
-                <span>{quantity}</span>
                 <MinusOutlined
                   onClick={() => {
                     decrementQuantity(productVariantId);
+                  }}
+                />
+                <span>{quantity}</span>
+                <PlusOutlined
+                  onClick={() => {
+                    incrementQuantity(productVariantId);
                   }}
                 />
               </div>
