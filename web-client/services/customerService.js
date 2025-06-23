@@ -47,6 +47,12 @@ const customerService = {
       confirm_password,
     });
   },
+
+  googleLogin: async (credential) => {
+    return await axiosClient.post("/customer/google-login", {
+      credential,
+    });
+  },
 };
 
 export default customerService;

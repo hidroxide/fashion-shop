@@ -25,4 +25,6 @@ router.post("/forgot-password", CustomerController.forgotPassword);
 
 router.put("/reset-password", CustomerController.resetPassword);
 
+router.post("/google-login", CustomerController.googleLogin);
+
 module.exports = router;

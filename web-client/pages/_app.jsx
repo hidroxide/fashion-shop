@@ -24,6 +24,11 @@ const App = ({ Component, pageProps }) => {
       <Head>
         <title>iCOND Website</title>
         <link rel="icon" href="/img/logo.png" />
+        <script
+          src="https://accounts.google.com/gsi/client"
+          async
+          defer
+        ></script>
       </Head>
       <AuthComponent>
         <Layout>
