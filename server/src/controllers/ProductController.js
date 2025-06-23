@@ -237,6 +237,8 @@ const listCustomerSide = async (req, res, next) => {
       result.sort(
         (a, b) => (b.variants[0]?.price || 0) - (a.variants[0]?.price || 0)
       );
+    } else if (sort === "sold_desc") {
+      result.sort((a, b) => (b.sold || 0) - (a.sold || 0));
     }
 
     return res.send(result);

@@ -31,6 +31,8 @@ const ProductsPage = () => {
             ? { title: `Kết quả tìm kiếm: "${search}"` }
             : category && category !== "undefined"
             ? { title: categoryTitle || "..." }
+            : sort === "sold_desc"
+            ? { title: "Sản phẩm bán chạy" }
             : { title: "Tất cả sản phẩm" },
         ].filter(Boolean)} // lọc bỏ null
       />
@@ -52,6 +54,7 @@ const ProductsPage = () => {
             { value: "", label: "Sắp xếp mặc định" },
             { value: "asc", label: "Giá tăng dần" },
             { value: "desc", label: "Giá giảm dần" },
+            { value: "sold_desc", label: "Bán chạy nhất" },
           ]}
         />
       </div>
