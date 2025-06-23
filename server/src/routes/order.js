@@ -17,4 +17,8 @@ router.get("/admin/detail/:order_id", OrderController.detailAdminSide);
 
 router.put("/change-status/:order_id/:state_id", OrderController.changeStatus);
 
+router.post("/create-payment-url", jwtAuth, OrderController.vnpayPayment);
+
+router.get("/callback-payment", OrderController.callBackPayment);
+
 module.exports = router;

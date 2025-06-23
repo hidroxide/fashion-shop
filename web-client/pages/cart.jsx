@@ -60,7 +60,21 @@ const CartPage = () => {
             address: values.address,
             order_items: orderItems,
           };
-          await orderService.placeOrder(order);
+
+          if (values.payment === "COD") {
+            await orderService.placeOrder(order);
+          }
+          if (values.payment === "VNPAY") {
+            const res = await orderService.vnpayOrder(order);
+            if (res.status === 200) {
+              router.push(res.data);
+            } else {
+              swtoast.error({
+                text: "Có lỗi khi tạo đơn hàng vui lòng thử lại!",
+              });
+            }
+          }
+
           clearCart();
           swtoast.success({ text: "Đặt hàng thành công" });
         } catch (err) {

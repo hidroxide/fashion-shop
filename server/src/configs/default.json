@@ -1,0 +1,8 @@
+{
+  "vnp_TmnCode": "UBBPG0PH",
+  "vnp_HashSecret": "0ICZD0O7VVJZV7DYVCKPGVQW0RWYP8VP",
+  "vnp_Url": "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
+  "vnp_Api": "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction",
+  "vnp_ReturnUrl": "http://localhost:8080/api/order/callback-payment",
+  "redirecUrl": "http://localhost:3001/account/orders"
+}

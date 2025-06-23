@@ -14,6 +14,10 @@ const orderService = {
     return await axiosJWT.post("/order/create", data);
   },
 
+  vnpayOrder: async (data) => {
+    return await axiosJWT.post("/order/create-payment-url", data);
+  },
+
   cancelOrder: async (orderId) => {
     return await axiosClient.put(`/order/change-status/${orderId}/5`);
   },
