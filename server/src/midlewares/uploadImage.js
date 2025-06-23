@@ -1,14 +1,7 @@
 const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const cloudinary = require("cloudinary").v2;
-
-// Cấu hình Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, // ví dụ: "your_cloud_name"
-  api_key: process.env.CLOUDINARY_API_KEY, // ví dụ: "1234567890"
-  api_secret: process.env.CLOUDINARY_API_SECRET, // ví dụ: "abcdefg123456"
-});
+const cloudinary = require("../configs/cloudinary");
 
 // Cấu hình storage sử dụng Cloudinary
 const storage = new CloudinaryStorage({

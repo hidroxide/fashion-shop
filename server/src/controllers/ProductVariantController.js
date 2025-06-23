@@ -5,6 +5,7 @@ const Product_Variant = require("../models/product_variant");
 const Product_Image = require("../models/product_image");
 const Product_Price_History = require("../models/product_price_history");
 const uploadImage = require("../midlewares/uploadImage");
+const cloudinary = require("../configs/cloudinary");
 
 let create = async (req, res, next) => {
   uploadImage(req, res, async (err) => {
