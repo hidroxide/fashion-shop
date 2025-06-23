@@ -52,7 +52,7 @@ let loginAdmin = async (req, res, next) => {
 };
 
 let registerUser = async (req, res) => {
-  const { email, password, customer_name, phone_number } = req.body;
+  const { email, password, customer_name, phone_number, address } = req.body;
 
   if (!email) return res.status(400).send("Trường email không tồn tại");
   if (!password) return res.status(400).send("Trường password không tồn tại");
@@ -73,6 +73,7 @@ let registerUser = async (req, res) => {
       user_id: newUser.user_id,
       customer_name: customer_name || "",
       phone_number: phone_number || "",
+      address: address || "", // 👈 Thêm dòng này
     });
 
     return res.send({ message: "Đăng ký thành công", data: newUser });
