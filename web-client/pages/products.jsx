@@ -60,7 +60,7 @@ const ProductsPage = () => {
       </div>
 
       <div className="product-page container">
-        <div className="product-list row pt-4">
+        <div className="product-list row pt-4 pb-4">
           {productList && productList.length ? (
             productList.map((product, index) => {
               const defaultVariant = product.variants?.[0];
