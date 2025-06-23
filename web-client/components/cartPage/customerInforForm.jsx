@@ -1,7 +1,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Button, Radio } from "antd";
 import { memo } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { FaShippingFast } from "react-icons/fa";
 import { object, string } from "yup";
 
@@ -32,6 +32,8 @@ const CustomerInforForm = ({
       .trim()
       .required("Vui lòng nhập Địa chỉ của bạn")
       .max(255, "Địa chỉ không được vượt quá 255 ký tự"),
+
+    payment: string(),
   });
   const {
     control,
@@ -89,21 +91,50 @@ const CustomerInforForm = ({
       <div className="payment">
         <div className="title">Hình thức thanh toán</div>
         <div>
-          <label
-            htmlFor=""
-            className="payment-item w-100 border-radius d-flex align-items-center justify-content-start"
-          >
-            <div className="payment-item-radio">
-              <Radio checked></Radio>
-            </div>
-            <div className="payment-item-icon">
-              <FaShippingFast />
-            </div>
-            <div className="payment-item-name">
-              <p className="text-uppercase">cod</p>
-              <p className="">Thanh toán khi nhận hàng</p>
-            </div>
-          </label>
+          <Controller
+            name="payment"
+            control={control}
+            defaultValue="COD"
+            render={({ field }) => (
+              <>
+                <label className="payment-item w-100 border-radius d-flex align-items-center justify-content-start">
+                  <div className="payment-item-radio">
+                    <Radio
+                      name={field.name}
+                      value="COD"
+                      checked={field.value === "COD"}
+                      onChange={field.onChange}
+                    />
+                  </div>
+                  <div className="payment-item-icon">
+                    <FaShippingFast />
+                  </div>
+                  <div className="payment-item-name">
+                    <p className="text-uppercase">COD</p>
+                    <p>Thanh toán khi nhận hàng</p>
+                  </div>
+                </label>
+
+                <label className="payment-item w-100 border-radius d-flex align-items-center justify-content-start">
+                  <div className="payment-item-radio">
+                    <Radio
+                      name={field.name}
+                      value="VNPAY"
+                      checked={field.value === "VNPAY"}
+                      onChange={field.onChange}
+                    />
+                  </div>
+                  <div className="payment-item-icon">
+                    <FaShippingFast />
+                  </div>
+                  <div className="payment-item-name">
+                    <p className="text-uppercase">VNPay</p>
+                    <p>Thanh toán VNPay</p>
+                  </div>
+                </label>
+              </>
+            )}
+          />
         </div>
       </div>
       <div className={"btn-container" + (isSubmitting ? " btn-loading" : "")}>

@@ -8,9 +8,21 @@ const Product = require("../models/product");
 const Product_Price_History = require("../models/product_price_history");
 const Order_Item = require("../models/order_item");
 const Feedback = require("../models/feedback");
+const moment = require("moment");
+const config = require("../configs/default.json");
 const Order_Status_Change_History = require("../models/order_status_change_history");
 
 let create = async (req, res, next) => {
+  try {
+    const newOrder = await createNewOrder(req, res);
+    return res.send(newOrder);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send("Gặp lỗi khi tạo đơn hàng vui lòng thử lại");
+  }
+};
+
+const createNewOrder = async (req, res) => {
   let user_id = req.token.customer_id;
   if (!user_id)
     return res.status(400).send({ message: "Access Token không hợp lệ" });
@@ -106,10 +118,9 @@ let create = async (req, res, next) => {
       where: { state_id: 1, state_name: "Chờ Xác Nhận" },
     });
     await newOrder.addOrder_State(state);
-    return res.send(newOrder);
+    return newOrder;
   } catch (err) {
-    console.log(err);
-    return res.status(500).send("Gặp lỗi khi tạo đơn hàng vui lòng thử lại");
+    throw err;
   }
 };
 
@@ -462,6 +473,101 @@ let changeStatus = async (req, res, next) => {
   }
 };
 
+const vnpayPayment = async (req, res) => {
+  process.env.TZ = "Asia/Ho_Chi_Minh";
+
+  let date = new Date();
+  let createDate = moment(date).format("YYYYMMDDHHmmss");
+
+  let newOrder = await createNewOrder(req, res);
+
+  let ipAddr =
+    req.headers["x-forwarded-for"] ||
+    req.connection.remoteAddress ||
+    req.socket.remoteAddress ||
+    req.connection.socket.remoteAddress;
+
+  let tmnCode = config.vnp_TmnCode;
+  let secretKey = config.vnp_HashSecret;
+  let vnpUrl = config.vnp_Url;
+  let returnUrl = config.vnp_ReturnUrl;
+  let orderId = newOrder.order_id;
+
+  let locale = req.body.language;
+  if (locale === null || locale === "") {
+    locale = "vn";
+  }
+  let amount = Number(newOrder.total_order_value || 0);
+  let vnp_Params = {
+    vnp_Version: "2.1.0",
+    vnp_Command: "pay",
+    vnp_TmnCode: tmnCode,
+    vnp_Locale: locale || "vn",
+    vnp_CurrCode: "VND",
+    vnp_TxnRef: orderId,
+    vnp_OrderInfo: "Thanh toan cho ma GD:" + orderId,
+    vnp_OrderType: "other",
+    vnp_Amount: amount * 100,
+    vnp_ReturnUrl: returnUrl,
+    vnp_IpAddr: ipAddr,
+    vnp_CreateDate: createDate,
+  };
+
+  vnp_Params = sortObject(vnp_Params);
+
+  let querystring = require("qs");
+  let signData = querystring.stringify(vnp_Params, { encode: false });
+  let crypto = require("crypto");
+  let hmac = crypto.createHmac("sha512", secretKey);
+  let signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
+  vnp_Params["vnp_SecureHash"] = signed;
+  vnpUrl += "?" + querystring.stringify(vnp_Params, { encode: false });
+
+  res.send(vnpUrl);
+};
+
+function sortObject(obj) {
+  let sorted = {};
+  let str = [];
+  let key;
+  for (key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      str.push(encodeURIComponent(key));
+    }
+  }
+  str.sort();
+  for (key = 0; key < str.length; key++) {
+    sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(/%20/g, "+");
+  }
+  return sorted;
+}
+
+const callBackPayment = async (req, res) => {
+  const { vnp_TxnRef, vnp_TransactionStatus } = req.query;
+  let order;
+  try {
+    order = await Order.findOne({ where: { order_id: vnp_TxnRef } });
+    if (order == null) return res.status(400).send("Order này không tồn tại");
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send("Gặp lỗi khi tạo đơn hàng vui lòng thử lại");
+  }
+  if (vnp_TransactionStatus === "00") {
+    let state = await Order_State.findOne({ where: { state_id: 7 } });
+    await order.addOrder_State(state);
+    // return res.send("Successfully");
+    return res.redirect(config.redirecUrl);
+  } else if (vnp_TransactionStatus === "02") {
+    let state = await Order_State.findOne({ where: { state_id: 5 } });
+    await order.addOrder_State(state);
+    // return res.send("Canceled");
+    return res.redirect(config.redirecUrl);
+  } else {
+    console.log(err);
+    return res.status(500).send("Gặp lỗi khi tạo đơn hàng vui lòng thử lại");
+  }
+};
+
 module.exports = {
   create,
   listAdminSide,
@@ -469,4 +575,6 @@ module.exports = {
   detailCustomerSide,
   detailAdminSide,
   changeStatus,
+  vnpayPayment,
+  callBackPayment,
 };
