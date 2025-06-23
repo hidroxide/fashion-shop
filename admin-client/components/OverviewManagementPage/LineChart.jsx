@@ -101,7 +101,7 @@ function LineChart() {
           </div>
 
           <Select
-            style={{ width: 160 }}
+            style={{ width: 160, height: 30, marginLeft: 10 }}
             value={month}
             onChange={setMonth}
             options={monthOptions}

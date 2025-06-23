@@ -22,8 +22,8 @@ const App = ({ Component, pageProps }) => {
   return (
     <QueryClientProvider client={queryClient}>
       <Head>
-        <title>elevenT</title>
-        <link rel="icon" href="/img/favicon.ico" />
+        <title>iCOND Website</title>
+        <link rel="icon" href="/img/logo.png" />
       </Head>
       <AuthComponent>
         <Layout>
