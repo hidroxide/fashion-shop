@@ -110,7 +110,7 @@ function LineChart() {
 
         <div className="sales">
           <ul>
-            <li>{<MinusOutlined />} Danh thu</li>
+            <li>{<MinusOutlined />} Doanh thu</li>
           </ul>
         </div>
       </div>
