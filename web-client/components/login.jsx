@@ -8,6 +8,8 @@ import InputField from "@/components/inputField";
 import { swtoast } from "@/mixins/swal.mixin";
 import customerService from "@/services/customerService";
 import useCustomerStore from "@/store/customerStore";
+import { useEffect, useRef } from "react";
+import jwtDecode from "jwt-decode";
 
 const Login = (props) => {
   const setCustomerLogin = useCustomerStore((state) => state.setCustomerLogin);
@@ -50,6 +52,42 @@ const Login = (props) => {
     }
   };
 
+  const googleBtnRef = useRef(null);
+
+  useEffect(() => {
+    if (window.google && googleBtnRef.current) {
+      window.google.accounts.id.initialize({
+        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID, // bạn cần khai báo env này
+        callback: handleGoogleLogin,
+      });
+
+      window.google.accounts.id.renderButton(googleBtnRef.current, {
+        theme: "outline",
+        size: "large",
+        width: "100%",
+      });
+    }
+  }, []);
+
+  const handleGoogleLogin = async (response) => {
+    try {
+      const res = await customerService.googleLogin(response.credential);
+      const customerInfor = {
+        accessToken: res?.data?.access_token,
+        accessTokenExpires: res?.data?.access_token_expires,
+      };
+      setCustomerLogin(customerInfor);
+      swtoast.success({
+        text: "Đăng nhập bằng Google thành công!",
+      });
+      props.toClose();
+    } catch (error) {
+      swtoast.error({
+        text: error.response?.data?.message || "Đăng nhập Google thất bại",
+      });
+    }
+  };
+
   return (
     <div
       className="user login w-100 position-absolute d-flex"
@@ -86,6 +124,10 @@ const Login = (props) => {
             </Button>
           </div>
         </form>
+        <div className="mt-3">
+          <div id="google-login-btn" ref={googleBtnRef}></div>
+        </div>
+
         <div className="footer-form d-flex justify-content-center flex-column align-items-center">
           {!isSubmitting && (
             <>

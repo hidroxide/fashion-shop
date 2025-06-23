@@ -5,6 +5,10 @@ const { jwtDecode } = require("jwt-decode");
 
 const User = require("../models/user");
 const Customer_Info = require("../models/customer_info");
+const { OAuth2Client } = require("google-auth-library");
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const client = new OAuth2Client(GOOGLE_CLIENT_ID);
+
 const {
   sendEmail,
   verifyEmailTemplate,
@@ -409,6 +413,74 @@ const resetPassword = async (req, res) => {
   }
 };
 
+let googleLogin = async (req, res) => {
+  const { credential } = req.body;
+  if (!credential) {
+    return res.status(400).send({ message: "Thiếu Google credential" });
+  }
+
+  try {
+    // Xác thực token từ Google
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    const email = payload.email;
+    const name = payload.name;
+    const sub = payload.sub;
+
+    // Kiểm tra user có tồn tại chưa
+    let user = await User.findOne({ where: { email, role_id: 2 } });
+
+    if (!user) {
+      // Tạo user mới nếu chưa tồn tại
+      user = await User.create({
+        email,
+        password: await bcrypt.hash(sub, 10), // dùng sub của Google làm mật khẩu tạm thời
+        role_id: 2,
+        is_verified: true,
+      });
+      await Customer_Info.create({
+        user_id: user.user_id,
+        customer_name: name,
+        phone_number: "",
+      });
+    }
+
+    // Tạo JWT
+    const accessToken = jwt.sign(
+      { customer_id: user.user_id },
+      process.env.ACCESSTOKEN_SECRET_KEY,
+      { expiresIn: process.env.ACCESSTOKEN_EXPIRES_IN }
+    );
+    const refreshToken = jwt.sign(
+      { customer_id: user.user_id },
+      process.env.REFRESHTOKEN_SECRET_KEY,
+      { expiresIn: process.env.REFRESHTOKEN_EXPIRES_IN }
+    );
+
+    const { exp } = jwtDecode(accessToken);
+
+    // Set cookie và trả token
+    res.cookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      path: "/",
+      sameSite: "strict",
+    });
+
+    return res.send({
+      access_token: accessToken,
+      access_token_expires: exp,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(401)
+      .send({ message: "Xác thực Google không hợp lệ hoặc đã hết hạn" });
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -420,4 +492,5 @@ module.exports = {
   verifyEmail,
   forgotPassword,
   resetPassword,
+  googleLogin,
 };
